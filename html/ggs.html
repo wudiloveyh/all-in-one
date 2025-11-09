@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <title>敏感信息 Google Dork 生成器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        * { box-sizing: border-box; }
+        html,body{ height:100%; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            background: #f6f8fa;
+            color: #2b3440;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+            line-height:1.45;
+        }
+
+        .container {
+            max-width: 920px;
+            margin: 36px auto;
+            padding: 24px;
+        }
+
+        header {
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:16px;
+            margin-bottom:18px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 500; /* 较轻的标题权重 */
+            color: #233041;
+        }
+        .subtitle {
+            color: #596576; /* 柔和灰蓝 */
+            font-size: 13px;
+            margin-top:6px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 28px rgba(28,36,52,0.06);
+            border: 1px solid rgba(18,24,36,0.03);
+        }
+
+        .controls {
+            display:flex;
+            gap:12px;
+            align-items:center;
+            margin-bottom:16px;
+            flex-wrap:wrap;
+        }
+
+        label {
+            display:block;
+            margin-bottom:6px;
+            font-size:13px;
+            color:#394552;
+            font-weight:500; /* 说明文本也不要太粗 */
+        }
+        input[type="text"] {
+            padding:10px 12px;
+            border-radius:8px;
+            border:1px solid #e6ebf2;
+            font-size:14px;
+            min-width:240px;
+            outline:none;
+            transition: box-shadow .18s, border-color .18s;
+            background: #fbfdff;
+            color: #243040;
+        }
+        input[type="text"]:focus {
+            box-shadow: 0 0 0 4px rgba(88,128,194,0.06);
+            border-color: #6d9be6;
+        }
+
+        .item-list { margin-top:6px; display:grid; gap:12px; }
+
+        .item {
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:12px;
+            padding:14px;
+            border-radius:10px;
+            background:#fbfdff;
+            border:1px solid #eef3f8;
+            transition: transform .12s, box-shadow .12s;
+        }
+        .item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(24,34,50,0.05);
+        }
+
+        .meta { flex:1 1 auto; min-width:0; }
+        .title {
+            font-weight:500;            /* 降低权重 */
+            color:#1f2a36;              /* 深色但不刺眼 */
+            margin-bottom:6px;
+            font-size:15px;
+            letter-spacing:0.1px;
+        }
+        .desc {
+            color:#5b6b78;              /* 柔和描述色 */
+            font-size:13px;
+            margin:0;
+        }
+
+        .actions {
+            display:flex;
+            gap:8px;
+            align-items:center;
+            white-space:nowrap;
+        }
+
+        /* 按钮使用扁平/轮廓风，颜色柔和 */
+        .btn {
+            border: 0;
+            padding: 8px 12px;
+            font-size:13px;
+            border-radius:8px;
+            cursor:pointer;
+            font-weight:600;  /* 按钮略微强调，但不夸张 */
+            min-width:98px;
+        }
+        .btn.search {
+            background: linear-gradient(180deg, rgba(95,140,235,0.12), rgba(95,140,235,0.08));
+            color:#1d4ed8;
+            border:1px solid rgba(29,78,216,0.12);
+            box-shadow:none;
+        }
+        .btn.search:hover { transform:translateY(-2px); box-shadow:0 8px 16px rgba(29,78,216,0.06); }
+
+        .btn.view {
+            background: transparent;
+            color:#23526a;
+            border:1px solid rgba(35,82,106,0.08);
+        }
+        .btn.copy {
+            background: #f4f6f8;
+            color:#273444;
+            border:1px solid #e7ecf3;
+        }
+
+        .raw {
+            margin-top:10px;
+            padding:10px 12px;
+            background:#0b1220;
+            color:#e6eef8;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+            font-size:12px;
+            border-radius:8px;
+            display:none;
+            word-break:break-all;
+            line-height:1.4;
+        }
+        .raw.visible { display:block; }
+
+        /* 控制按钮区域右侧的两个小按钮布局 */
+        .right-controls { margin-left:auto; display:flex; gap:8px; align-items:center; }
+
+        .footer-note {
+            margin-top:12px;
+            color:#6b7280;
+            font-size:13px;
+        }
+
+        @media (max-width:640px) {
+            .actions { flex-direction:column; align-items:stretch; width:140px; }
+            .item { flex-direction:column; align-items:stretch; }
+            .right-controls { margin-left:0; width:100%; justify-content:flex-end; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>敏感信息 Google Dork 生成器</h1>
+                <div class="subtitle">默认隐藏 dork 语句，仅展示用途说明。需要时可查看或复制原始语句。</div>
+            </div>
+        </header>
+
+        <div class="card">
+            <div class="controls">
+                <div>
+                    <label for="siteInput">目标站点（替换 site: 后部份）</label>
+                    <input id="siteInput" type="text" placeholder="例如：edu.cn" value="edu.cn" />
+                </div>
+
+                <div class="right-controls">
+                    <button id="copyAllBtn" class="btn copy" title="复制所有 dork 语句（谨慎使用）">复制所有语句</button>
+                    <button id="toggleRevealAll" class="btn view" title="展开/收起所有原始语句">展开全部语句</button>
+                </div>
+            </div>
+
+            <div id="list" class="item-list"></div>
+
+            <div class="footer-note">
+                注：请仅在获得授权的范围内使用本工具。用于安全测试/教学请遵守法律与机构政策。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const templates = [
+            `site:{{site}} ("默认密码" OR "学号" OR "工号")`,
+            `site:{{site}} (inurl:login OR inurl:admin OR inurl:index OR inurl:登录) OR (inurl:config | inurl:env | inurl:setting | inurl:backup | inurl:admin | inurl:php)`,
+            `site:{{site}} filetype:txt OR filetype:xls OR filetype:xlsx OR filetype:doc OR filetype:docx OR filetype:pdf`,
+            `site:openbugbounty.org inurl:reports intext:{{site}}`,
+            `site:{{site}} ext:log | ext:txt | ext:conf | ext:cnf | ext:ini | ext:env | ext:sh | ext:bak | ext:backup | ext:swp | ext:old | ext:~ | ext:git | ext:svn | ext:htpasswd | ext:htaccess`,
+            `inurl:q= | inurl:s= | inurl:search= | inurl:query= | inurl:keyword= | inurl:lang= inurl:& site:{{site}}`,
+            `inurl:url= | inurl:return= | inurl:next= | inurl:redirect= | inurl:redir= | inurl:ret= | inurl:r2= | inurl:page= inurl:& inurl:http site:{{site}}`,
+            `inurl:id= | inurl:pid= | inurl:category= | inurl:cat= | inurl:action= | inurl:sid= | inurl:dir= inurl:& site:{{site}}`,
+            `inurl:http | inurl:url= | inurl:path= | inurl:dest= | inurl:html= | inurl:data= | inurl:domain= | inurl:page= inurl:& site:{{site}}`,
+            `inurl:include | inurl:dir | inurl:detail= | inurl:file= | inurl:folder= | inurl:inc= | inurl:locate= | inurl:doc= | inurl:conf= inurl:& site:{{site}}`,
+            `inurl:cmd | inurl:exec= | inurl:query= | inurl:code= | inurl:do= | inurl:run= | inurl:read= | inurl:ping= inurl:& site:{{site}}`,
+            `inurl:email= | inurl:phone= | inurl:password= | inurl:secret= inurl:& site:{{site}}`,
+            `inurl:apidocs | inurl:api-docs | inurl:swagger | inurl:api-explorer site:{{site}}`,
+            `site:pastebin.com {{site}}`,
+            `site:s3.amazonaws.com {{site}}`,
+            `site:jfrog.io {{site}}`,
+            `site:firebaseio.com {{site}}`,
+            `site:{{site}} "choose file"`,
+            `"submit vulnerability report" | "powered by bugcrowd" | "powered by hackerone" site:*/security.txt "bounty"`,
+            `site:*/server-status apache`,
+            `inurl:/wp-admin/admin-ajax.php site:{{site}}`
+        ];
+
+        const descriptions = [
+            '查找页面或文件中出现“默认密码 / 学号 / 工号”字样（快速定位明文凭证）',
+            '定位可能的登录/管理入口与配置页面（后台、配置文件、登录页等）',
+            '检索常见文档类型（txt/xls/doc/pdf 等）以寻找明文信息',
+            '在 OpenBugBounty 报告中搜索与目标域相关的披露/报告',
+            '查找可能泄露的配置或备份文件（log/conf/ini/env/htpasswd 等）',
+            '查找带有查询参数的搜索页面（可能存在注入或信息泄露）',
+            '查找带 redirect/return/next 等参数的 URL（常用于开放重定向）',
+            '查找带 id/category/action 等参数的页面（可能用于参数篡改 / IDOR）',
+            '查找 URL 中包含外部资源参数（可能存在 SSRF / open-redirect）',
+            '查找包含 include/file/inc/doc/conf 等可能被包含的文件接口（包含风险）',
+            '查找具有执行/命令相关参数的页面（例如 exec/query/ping，可能存在命令注入）',
+            '查找 URL 中传递的 email/phone/password/secret 等敏感字段',
+            '查找开放的 API 文档（swagger / apidocs）以分析接口与权限',
+            '在 Pastebin 中查找目标相关泄露（常见敏感信息渠道）',
+            '搜索公开的 S3 存储（可能有公开配置或备份）',
+            '搜索 JFrog/Artifactory 中公开的构件与仓库信息',
+            '搜索 Firebase Realtime DB（firebaseio.com）可能的公开数据',
+            '查找页面中出现“choose file”/文件上传选择相关的交互（可能被滥用）',
+            '查找公开漏洞激励平台与安全响应文档（寻找已披露问题线索）',
+            '检查服务器状态页（如 Apache server-status）以获取内部信息',
+            '查找 WordPress admin-ajax 的调用点（可用于挖掘 WP 漏洞或信息收集）'
+        ];
+
+        const listEl = document.getElementById('list');
+        const siteInput = document.getElementById('siteInput');
+
+        function buildDork(template, site) {
+            return template.replace(/\{\{site\}\}/g, site);
+        }
+
+        function render() {
+            const site = siteInput.value.trim() || 'edu.cn';
+            listEl.innerHTML = '';
+            templates.forEach((tpl, idx) => {
+                const dork = buildDork(tpl, site);
+                const desc = descriptions[idx] || '（功能说明缺失）';
+
+                const item = document.createElement('div');
+                item.className = 'item';
+
+                item.innerHTML = `
+                    <div class="meta">
+                        <div class="title">${idx + 1}. ${desc}</div>
+                        <p class="desc">用途：${desc}</p>
+                        <div class="raw" id="raw-${idx}">${escapeHtml(dork)}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn search" data-index="${idx}">Google 搜索</button>
+                        <button class="btn view" data-index="${idx}">查看语句</button>
+                        <button class="btn copy" data-index="${idx}">复制语句</button>
+                    </div>
+                `;
+                listEl.appendChild(item);
+            });
+
+            bindActionButtons();
+        }
+
+        function bindActionButtons() {
+            document.querySelectorAll('.btn.search').forEach(btn => {
+                btn.onclick = () => {
+                    const idx = Number(btn.dataset.index);
+                    const site = siteInput.value.trim() || 'edu.cn';
+                    const q = buildDork(templates[idx], site);
+                    const url = 'https://www.google.com/search?q=' + encodeURIComponent(q);
+                    window.open(url, '_blank');
+                };
+            });
+
+            document.querySelectorAll('.btn.view').forEach(btn => {
+                btn.onclick = () => {
+                    const idx = Number(btn.dataset.index);
+                    const rawEl = document.getElementById('raw-' + idx);
+                    rawEl.classList.toggle('visible');
+                    btn.textContent = rawEl.classList.contains('visible') ? '收起语句' : '查看语句';
+                };
+            });
+
+            document.querySelectorAll('.btn.copy').forEach(btn => {
+                btn.onclick = async () => {
+                    const idx = Number(btn.dataset.index);
+                    const site = siteInput.value.trim() || 'edu.cn';
+                    const dork = buildDork(templates[idx], site);
+                    try {
+                        await navigator.clipboard.writeText(dork);
+                        const old = btn.textContent;
+                        btn.textContent = '已复制';
+                        setTimeout(() => btn.textContent = old, 900);
+                    } catch (e) {
+                        alert('复制失败，请手动复制：\n' + dork);
+                    }
+                };
+            });
+        }
+
+        document.getElementById('toggleRevealAll').onclick = () => {
+            const raws = document.querySelectorAll('.raw');
+            const anyHidden = Array.from(raws).some(r => !r.classList.contains('visible'));
+            raws.forEach(r => r.classList.toggle('visible', anyHidden));
+            document.getElementById('toggleRevealAll').textContent = anyHidden ? '收起全部语句' : '展开全部语句';
+            document.querySelectorAll('.btn.view').forEach(b => b.textContent = anyHidden ? '收起语句' : '查看语句');
+        };
+
+        document.getElementById('copyAllBtn').onclick = async () => {
+            const site = siteInput.value.trim() || 'edu.cn';
+            const all = templates.map(t => buildDork(t, site)).join('\n\n');
+            try {
+                await navigator.clipboard.writeText(all);
+                const el = document.getElementById('copyAllBtn');
+                const old = el.textContent;
+                el.textContent = '已复制全部';
+                setTimeout(() => el.textContent = old, 1000);
+            } catch (e) {
+                alert('复制失败，请手动复制。');
+            }
+        };
+
+        siteInput.addEventListener('input', render);
+        render();
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+    </script>
+</body>
+</html>
