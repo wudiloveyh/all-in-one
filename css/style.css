@@ -54,7 +54,7 @@ a:hover {
 }
 
 .selected {
-    background-color: #84b997; /* 高亮颜色 */
+    background-color: #ffe8e7; /* 高亮颜色 */
 }
 
 @media (max-width: 400px) {
