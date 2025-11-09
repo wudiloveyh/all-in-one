@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>FOFA 搜索语法自动生成器</title>
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+    margin: 0;
+    padding: 40px 20px;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    background-attachment: fixed;
+  }
+
+  .container {
+    width: 480px; /* 页面容器宽度 */
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    color: #1e3a8a;
+    margin-bottom: 30px;
+  }
+
+  #keyword {
+    display: block;
+    width: 100%;
+    margin: 0 auto 30px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: 2px solid #1e3a8a;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  #keyword:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
+  }
+
+  #results {
+    width: 500px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    justify-items: center; /* 添加居中对齐 */
+  }
+
+  .syntax {
+    background: #ffffff;
+    padding: 15px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    width: 250px; /* 最大宽度 */
+    height: 60px;
+  }
+
+  .syntax:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .syntax span {
+    font-family: monospace;
+    font-size: 0.95rem;
+    color: #111827;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    margin-right: 10px;
+  }
+
+  .syntax button {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 8px;
+    background-color: #1e3a8a;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s, transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .syntax button:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+  }
+
+  .alert {
+    position: fixed;
+    top: 20px;
+    right: 2%; 
+    /* transform: translateX(-50%);  */
+    background-color: #2563eb;
+    color: #ffffff;
+    padding: 12px 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-weight: thin;
+    z-index: 1000;
+    opacity: 0.95;
+  }
+
+  @media (max-width: 500px) {
+    .container {
+      width: 100%;
+    }
+    .syntax {
+      width: 100%; /* 在小屏幕设备上允许卡片宽度占满容器 */
+    }
+    #results {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>FOFA 搜索语法自动生成器</h1>
+  <input id="keyword" placeholder="输入关键字，例如 wordpress">
+  <div id="results"></div>
+</div>
+
+<script>
+const FOFA_TEMPLATES = [
+  { field: 'title' },
+  { field: 'body' },
+  { field: 'header' },
+  { field: 'domain' },
+  { field: 'host' },
+  { field: 'app' },
+  { field: 'cert' },
+  { field: 'icon_hash' }
+];
+
+window.addEventListener('DOMContentLoaded', () => {
+  const keywordInput = document.getElementById('keyword');
+  keywordInput.addEventListener('input', debounce(generateSyntax, 300));
+});
+
+function generateSyntax() {
+  const keyword = document.getElementById('keyword').value.trim();
+  const resultContainer = document.getElementById('results');
+  resultContainer.innerHTML = '';
+  if (!keyword) return;
+
+  FOFA_TEMPLATES.forEach(({ field }) => {
+    const syntax = `${field}="${keyword}"`;
+    resultContainer.appendChild(createSyntaxItem(syntax));
+  });
+}
+
+function createSyntaxItem(syntax) {
+  const container = document.createElement('div');
+  container.className = 'syntax';
+
+  const textSpan = document.createElement('span');
+  textSpan.textContent = syntax;
+
+  const copyButton = document.createElement('button');
+  copyButton.textContent = '复制';
+  copyButton.addEventListener('click', () => handleCopy(syntax));
+
+  container.append(textSpan, copyButton);
+  return container;
+}
+
+async function handleCopy(content) {
+  try {
+    await navigator.clipboard.writeText(content);
+    showFeedback('✅ 已复制：' + content);
+  } catch (err) {
+    console.error('复制失败:', err);
+    showFeedback('❌ 复制失败，请检查浏览器权限');
+  }
+}
+
+function showFeedback(message) {
+  const existingAlert = document.querySelector('.alert');
+  if (existingAlert) existingAlert.remove();
+  const alert = document.createElement('div');
+  alert.className = 'alert';
+  alert.textContent = message;
+  document.body.appendChild(alert);
+  setTimeout(() => alert.remove(), 2000);
+}
+
+function debounce(fn, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+</script>
+</body>
+</html>
