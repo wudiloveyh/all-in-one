@@ -32,7 +32,10 @@ input[type="text"] {
     transition: border-color 0.3s, box-shadow 0.3s;  /* 交互效果 */
     outline: none;
 }
-
+input[type="text"]:hover {
+    border-color: #84b997;  /* 聚焦时边框颜色 */
+    box-shadow: 0 0 5px rgba(132, 185, 151, 0.5);  /* 聚焦时阴影效果 */
+}
 input[type="text"]:focus {
     border-color: #84b997;  /* 聚焦时边框颜色 */
     box-shadow: 0 0 5px rgba(132, 185, 151, 0.5);  /* 聚焦时阴影效果 */
