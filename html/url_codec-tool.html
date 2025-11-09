@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>URL 编解码工具</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f9fafb;
+            --card-color: #ffffff;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+            --success-color: #10b981;
+        }
+
+        body {
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: var(--card-color);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            height: 120px;
+            padding: 12px 14px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        button {
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            font-size: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .copy-btn {
+            background: #10b981;
+        }
+
+        .copy-btn:hover {
+            background: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        }
+
+        .result-box {
+            background: #f3f4f6;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 15px;
+            min-height: 60px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 13px;
+            color: #9ca3af;
+            margin-top: 15px;
+        }
+
+        .toast {
+            text-align: center;
+            font-size: 14px;
+            color: var(--success-color);
+            margin-top: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 URL 编解码工具</h1>
+        <textarea id="inputText" placeholder="请输入要编码或解码的文本..."></textarea>
+        <div class="buttons">
+            <button id="encodeBtn">编码</button>
+            <button id="decodeBtn">解码</button>
+            <button id="copyBtn" class="copy-btn">复制结果</button>
+        </div>
+        <div class="result-box" id="result">结果将在此显示...</div>
+        <div class="toast" id="toast">✅ 已复制到剪贴板！</div>
+        <div class="footer">Made with 💙 by 初雪</div>
+    </div>
+
+    <script>
+        const input = document.getElementById('inputText');
+        const result = document.getElementById('result');
+        const copyBtn = document.getElementById('copyBtn');
+        const toast = document.getElementById('toast');
+
+        document.getElementById('encodeBtn').addEventListener('click', () => {
+            const text = input.value.trim();
+            if (!text) return result.textContent = '⚠️ 请输入要编码的内容。';
+            result.textContent = encodeURIComponent(text);
+        });
+
+        document.getElementById('decodeBtn').addEventListener('click', () => {
+            const text = input.value.trim();
+            if (!text) return result.textContent = '⚠️ 请输入要解码的内容。';
+            try {
+                result.textContent = decodeURIComponent(text);
+            } catch {
+                result.textContent = '❌ 解码失败，请输入有效的 URL 编码文本。';
+            }
+        });
+
+        copyBtn.addEventListener('click', async () => {
+            const text = result.textContent.trim();
+            if (!text || text.startsWith('⚠️') || text.startsWith('❌') || text === '结果将在此显示...') {
+                toast.textContent = '⚠️ 没有可复制的内容。';
+                toast.style.color = '#f59e0b';
+            } else {
+                await navigator.clipboard.writeText(text);
+                toast.textContent = '✅ 已复制到剪贴板！';
+                toast.style.color = '#10b981';
+            }
+
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 1800);
+        });
+    </script>
+</body>
+</html>
