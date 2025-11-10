@@ -1,193 +1,207 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>高级网络/IP计算器</title>
-<style>
-/* ===== 全局样式 ===== */
-:root {
-    --primary-color: #4f46e5;
-    --accent-color: #6366f1;
-    --bg-color: #f9fafb;
-    --card-color: #ffffff;
-    --text-color: #111827;
-    --subtle-text: #6b7280;
-    --input-border: #d1d5db;
-    --shadow: rgba(0,0,0,0.1);
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高级网络/IP计算器</title>
+    <style>
+        @font-face {
+            font-family: 'MyFont';
+            /* 自定义一个字体名称（随意起名） */
+            src: url('../font.ttf') format('truetype');
+            /* 根据实际路径调整 */
+            font-weight: normal;
+            font-style: normal;
+        }
 
-* {
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+        /* ===== 全局样式 ===== */
+        :root {
+            --primary-color: #4f46e5;
+            --accent-color: #6366f1;
+            --bg-color: #f9fafb;
+            --card-color: #ffffff;
+            --text-color: #111827;
+            --subtle-text: #6b7280;
+            --input-border: #d1d5db;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
 
-body {
-    margin: 0;
-    background: var(--bg-color);
-    color: var(--text-color);
-}
+        * {
+            box-sizing: border-box;
+            font-family: 'MyFont', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-/* ===== 页面布局 ===== */
-header {
-    text-align: center;
-    padding: 2rem 1rem;
-}
+        body {
+            margin: 0;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
 
-header h1 {
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
-}
+        /* ===== 页面布局 ===== */
+        header {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
 
-.container {
-    max-width: 900px;
-    margin: auto;
-    padding: 1rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-}
+        header h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
 
-.card {
-    background: var(--card-color);
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 10px 25px var(--shadow);
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
-}
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
 
-/* ===== 轻微交互效果 ===== */
-.card:hover {
-    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-    transform: scale(1.02);
-}
+        .card {
+            background: var(--card-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 25px var(--shadow);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
 
-/* ===== 输入框 ===== */
-input, select {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--input-border);
-    border-radius: 8px;
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-    font-size: 1rem;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
+        /* ===== 轻微交互效果 ===== */
+        .card:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            transform: scale(1.02);
+        }
 
-input:focus, select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.3);
-}
+        /* ===== 输入框 ===== */
+        input,
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
 
-/* ===== 按钮 ===== */
-button {
-    background: var(--primary-color);
-    color: #fff;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
+        input:focus,
+        select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
 
-button:hover {
-    background: var(--accent-color);
-}
+        /* ===== 按钮 ===== */
+        button {
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
 
-/* ===== 输出 ===== */
-.output {
-    background: #f3f4f6;
-    padding: 1rem;
-    border-radius: 12px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+        button:hover {
+            background: var(--accent-color);
+        }
 
-.output table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-}
+        /* ===== 输出 ===== */
+        .output {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-.output th, .output td {
-    text-align: left;
-    padding: 0.5rem;
-    border-bottom: 1px solid #e5e7eb;
-}
+        .output table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
 
-.output th {
-    width: 40%;
-    color: var(--subtle-text);
-}
+        .output th,
+        .output td {
+            text-align: left;
+            padding: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
 
-.output td {
-    font-family: monospace;
-    color: var(--text-color);
-}
+        .output th {
+            width: 40%;
+            color: var(--subtle-text);
+        }
 
-/* ===== 响应式 ===== */
-@media(max-width: 768px) {
-    .container {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
+        .output td {
+            font-family: monospace;
+            color: var(--text-color);
+        }
+
+        /* ===== 响应式 ===== */
+        @media(max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<header>
-    <h1>高级网络/IP计算器</h1>
-    <p>输入 IP + 子网掩码，立即计算网络信息</p>
-</header>
+    <header>
+        <h1>高级网络/IP计算器</h1>
+        <p>输入 IP + 子网掩码，立即计算网络信息</p>
+    </header>
 
-<div class="container">
-    <div class="card">
-        <h2>输入信息</h2>
-        <label>IP 地址:</label>
-        <input type="text" id="ip" placeholder="例如 192.168.1.10">
-        
-        <label>子网掩码 (CIDR):</label>
-        <input type="number" id="cidr" placeholder="例如 24" min="1" max="32">
-        
-        <button onclick="calculate()">计算</button>
+    <div class="container">
+        <div class="card">
+            <h2>输入信息</h2>
+            <label>IP 地址:</label>
+            <input type="text" id="ip" placeholder="例如 192.168.1.10">
+
+            <label>子网掩码 (CIDR):</label>
+            <input type="number" id="cidr" placeholder="例如 24" min="1" max="32">
+
+            <button onclick="calculate()">计算</button>
+        </div>
+
+        <div class="card">
+            <h2>结果</h2>
+            <div class="output" id="output">结果将在这里显示</div>
+        </div>
     </div>
-    
-    <div class="card">
-        <h2>结果</h2>
-        <div class="output" id="output">结果将在这里显示</div>
-    </div>
-</div>
 
-<script>
-// ===== 工具函数 =====
-function ipToInt(ip) {
-    return ip.split('.').reduce((acc, oct) => (acc << 8) + parseInt(oct, 10), 0) >>> 0;
-}
+    <script>
+        // ===== 工具函数 =====
+        function ipToInt(ip) {
+            return ip.split('.').reduce((acc, oct) => (acc << 8) + parseInt(oct, 10), 0) >>> 0;
+        }
 
-function intToIp(num) {
-    return [(num >>> 24) & 255, (num >>> 16) & 255, (num >>> 8) & 255, num & 255].join('.');
-}
+        function intToIp(num) {
+            return [(num >>> 24) & 255, (num >>> 16) & 255, (num >>> 8) & 255, num & 255].join('.');
+        }
 
-function calculate() {
-    const ip = document.getElementById('ip').value.trim();
-    const cidr = parseInt(document.getElementById('cidr').value);
-    const output = document.getElementById('output');
+        function calculate() {
+            const ip = document.getElementById('ip').value.trim();
+            const cidr = parseInt(document.getElementById('cidr').value);
+            const output = document.getElementById('output');
 
-    if(!/^(\d{1,3}\.){3}\d{1,3}$/.test(ip) || cidr < 1 || cidr > 32) {
-        output.innerHTML = "<p style='color:red;'>请输入有效的 IP 地址和 CIDR 掩码 (1-32)</p>";
-        return;
-    }
+            if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(ip) || cidr < 1 || cidr > 32) {
+                output.innerHTML = "<p style='color:red;'>请输入有效的 IP 地址和 CIDR 掩码 (1-32)</p>";
+                return;
+            }
 
-    const ipInt = ipToInt(ip);
-    const mask = cidr === 32 ? 0xFFFFFFFF : (0xFFFFFFFF << (32 - cidr)) >>> 0;
-    const network = ipInt & mask;
-    const broadcast = network | (~mask >>> 0);
-    const totalHosts = Math.max(0, broadcast - network - 1);
-    const firstHost = totalHosts > 0 ? network + 1 : network;
-    const lastHost = totalHosts > 0 ? broadcast - 1 : broadcast;
+            const ipInt = ipToInt(ip);
+            const mask = cidr === 32 ? 0xFFFFFFFF : (0xFFFFFFFF << (32 - cidr)) >>> 0;
+            const network = ipInt & mask;
+            const broadcast = network | (~mask >>> 0);
+            const totalHosts = Math.max(0, broadcast - network - 1);
+            const firstHost = totalHosts > 0 ? network + 1 : network;
+            const lastHost = totalHosts > 0 ? broadcast - 1 : broadcast;
 
-    output.innerHTML = `
+            output.innerHTML = `
 <table>
 <tr><th>IP 地址</th><td>${ip}</td></tr>
 <tr><th>子网掩码</th><td>${intToIp(mask)} (/ ${cidr})</td></tr>
@@ -197,8 +211,9 @@ function calculate() {
 <tr><th>总主机数</th><td>${totalHosts}</td></tr>
 <tr><th>网络类型</th><td>${cidr <= 30 ? '标准局域网' : cidr === 31 ? '点到点网络' : '单主机网络'}</td></tr>
 </table>`;
-}
-</script>
+        }
+    </script>
 
 </body>
+
 </html>
