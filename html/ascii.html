@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ASCII 转码工具</title>
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa6b2; --accent:#06b6d4; --glass:rgba(255,255,255,0.03);
+      --radius:14px; --soft:12px; --gap:16px; --shadow:0 6px 20px rgba(2,6,23,0.6);
+      color-scheme: dark;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;color:#e6eef3;background:linear-gradient(180deg,#071022 0%, #071524 50%, #031119 100%);}
+    .wrap{max-width:1100px;margin:36px auto;padding:28px;border-radius:20px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:var(--shadow);}
+    header{display:flex;align-items:center;gap:18px}
+    header h1{margin:0;font-size:20px}
+    header p{margin:0;color:var(--muted);font-size:13px}
+
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+    .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 4px 14px rgba(2,6,23,0.45);}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+    textarea{width:100%;min-height:160px;resize:vertical;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);color:#eaf6ff;font-size:14px}
+
+    .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn{background:var(--glass);border:1px solid rgba(255,255,255,0.03);color:#dff6fb;padding:8px 12px;border-radius:10px;font-weight:600;cursor:pointer}
+    .btn.primary{background:linear-gradient(90deg,var(--accent), #60a5fa);color:#042024}
+    .small{padding:6px 8px;font-size:13px}
+
+    .row{display:flex;gap:10px;align-items:center}
+    .seg{display:inline-flex;background:rgba(255,255,255,0.02);border-radius:10px;padding:4px;border:1px solid rgba(255,255,255,0.02)}
+    .seg button{background:transparent;border:0;padding:8px 12px;color:var(--muted);cursor:pointer;border-radius:8px}
+    .seg button.active{background:rgba(255,255,255,0.03);color:#eaf6ff}
+
+    .meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+    .meta .hint{color:var(--muted);font-size:13px}
+
+    pre.output{white-space:pre-wrap;word-break:break-word;min-height:160px;padding:14px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));color:#eaf6ff;border:1px solid rgba(255,255,255,0.02);font-size:14px}
+
+    .footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:var(--muted);font-size:13px}
+    .history{max-height:160px;overflow:auto;margin-top:10px;padding:10px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+    .history-item{padding:8px;border-radius:8px;margin-bottom:6px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);display:flex;justify-content:space-between;align-items:center}
+    .chip{font-size:12px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);color:var(--muted)}
+
+    .top-actions{display:flex;gap:8px;margin-left:auto}
+    .kbd{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;font-weight:700;color:var(--muted);font-size:12px}
+
+    @media (max-width:900px){.grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+  <div class="wrap" role="application">
+    <header>
+      <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;color:#001217">ASCII</div>
+      <div>
+        <h1>ASCII 转码工具 — 纯前端（HTML/CSS/JS）</h1>
+        <p>支持文本 ↔ ASCII（十进制/十六进制/二进制），自定义分隔符，历史与导出，键盘快捷键，界面清爽交互流畅。</p>
+      </div>
+      <div class="top-actions" aria-hidden="true">
+        <div class="kbd">Ctrl/Cmd + E 编码</div>
+        <div class="kbd">Ctrl/Cmd + D 解码</div>
+        <div class="kbd">Ctrl/Cmd + K 清除</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <label for="input">输入 (文本或数字串)</label>
+        <textarea id="input" placeholder="在此输入要编码或解码的内容"></textarea>
+
+        <div class="meta">
+          <div class="controls">
+            <div class="seg" role="tablist" aria-label="模式切换">
+              <button id="mode-encode" class="active">编码</button>
+              <button id="mode-decode">解码</button>
+            </div>
+
+            <div class="seg" style="margin-left:8px" aria-label="输出格式">
+              <button data-format="dec" class="active">十进制</button>
+              <button data-format="hex">十六进制</button>
+              <button data-format="bin">二进制</button>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:8px;margin-left:8px">
+              <label style="margin:0;color:var(--muted);font-size:13px">分隔符</label>
+              <input id="delimiter" value=" " style="width:100px;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#eaf6ff" />
+            </div>
+          </div>
+
+          <div class="row">
+            <button id="run" class="btn primary">执行</button>
+            <button id="clear" class="btn small">清除</button>
+            <button id="paste" class="btn small">粘贴</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+          <div style="flex:1">
+            <label style="font-size:13px;color:var(--muted);margin-bottom:6px;display:block">示例</label>
+            <div style="display:flex;gap:8px">
+              <button class="btn small" data-sample="Hello, ASCII!">Hello 示例</button>
+              <button class="btn small" data-sample="中国">中文示例</button>
+              <button class="btn small" data-sample="72 101 108 108 111">数字示例</button>
+            </div>
+          </div>
+          <div style="width:220px;text-align:right;color:var(--muted);font-size:13px">历史保存在本地，可点击恢复</div>
+        </div>
+
+        <div class="history" id="history" aria-live="polite"></div>
+      </section>
+
+      <section class="card">
+        <label for="output">输出</label>
+        <pre id="output" class="output" tabindex="0" aria-label="输出结果"></pre>
+
+        <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+          <button id="copy" class="btn small">复制</button>
+          <button id="download" class="btn small">下载 .txt</button>
+          <button id="selectAll" class="btn small">全部选中</button>
+          <div style="flex:1"></div>
+          <div style="color:var(--muted);font-size:13px">长度: <span id="outlen">0</span></div>
+        </div>
+
+        <div style="margin-top:12px;color:var(--muted);font-size:13px">
+          说明：编码把文本转换为指定格式的数值串；解码将数值串解析回字符，支持 0x 前缀或 0b 前缀，也支持根据当前格式解析无前缀数字。
+        </div>
+      </section>
+    </div>
+
+  </div>
+
+  <script>
+    // 元素
+    const inputEl = document.getElementById('input');
+    const outputEl = document.getElementById('output');
+    const runBtn = document.getElementById('run');
+    const clearBtn = document.getElementById('clear');
+    const pasteBtn = document.getElementById('paste');
+    const copyBtn = document.getElementById('copy');
+    const downloadBtn = document.getElementById('download');
+    const selectAllBtn = document.getElementById('selectAll');
+    const outlen = document.getElementById('outlen');
+    const delimiterEl = document.getElementById('delimiter');
+    const historyEl = document.getElementById('history');
+
+    // 状态
+    let mode = 'encode'; // encode | decode
+    let format = 'dec'; // dec | hex | bin
+
+    // 初始化 from localStorage
+    const HISTORY_KEY = 'ascii_tool_history_v1';
+    function loadHistory(){
+      try{
+        const raw = localStorage.getItem(HISTORY_KEY);
+        return raw ? JSON.parse(raw) : [];
+      }catch(e){return []}
+    }
+    function saveHistory(arr){localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0,30)));}
+    let history = loadHistory();
+
+    function renderHistory(){
+      historyEl.innerHTML = '';
+      if(!history.length){historyEl.innerHTML='<div style="color:var(--muted);font-size:13px">暂无历史</div>';return}
+      history.slice().reverse().forEach((h, idx)=>{
+        const div = document.createElement('div');div.className='history-item';
+        const left = document.createElement('div');left.style.maxWidth='72%';left.style.overflow='hidden';left.style.textOverflow='ellipsis';left.style.whiteSpace='nowrap';left.title=h.input;left.textContent=h.input;
+        const right = document.createElement('div');right.style.display='flex';right.style.gap='8px';
+        const btn = document.createElement('button');btn.className='btn small';btn.textContent='恢复';btn.onclick=()=>{inputEl.value=h.input;delimiterEl.value=h.delimiter||' ';setFormatFromUI(h.format||'dec');setModeFromUI(h.mode||'encode')};
+        const del = document.createElement('button');del.className='btn small';del.textContent='删除';del.onclick=()=>{history.splice(history.length-1-idx,1);saveHistory(history);renderHistory()};
+        right.appendChild(btn);right.appendChild(del);
+        div.appendChild(left);div.appendChild(right);historyEl.appendChild(div);
+      })
+    }
+    renderHistory();
+
+    // 工具函数
+    function setModeFromUI(m){mode=m;document.getElementById('mode-encode').classList.toggle('active', m==='encode');document.getElementById('mode-decode').classList.toggle('active', m==='decode')}
+    function setFormatFromUI(f){format=f;document.querySelectorAll('[data-format]').forEach(b=>b.classList.toggle('active', b.dataset.format===f))}
+
+    document.getElementById('mode-encode').addEventListener('click', ()=>{setModeFromUI('encode')});
+    document.getElementById('mode-decode').addEventListener('click', ()=>{setModeFromUI('decode')});
+    document.querySelectorAll('[data-format]').forEach(b=>b.addEventListener('click', ()=>{setFormatFromUI(b.dataset.format)}));
+
+    function toCodePoints(text){
+      const codes=[];
+      for(let i=0;i<text.length;i++){
+        const code = text.codePointAt(i);
+        codes.push(code);
+        if(code>0xFFFF) i++; // surrogate pair skip
+      }
+      return codes;
+    }
+
+    function formatNumber(n){
+      if(format==='dec') return String(n);
+      if(format==='hex') return '0x'+n.toString(16).toUpperCase();
+      if(format==='bin') return '0b'+n.toString(2);
+      return String(n);
+    }
+
+    function encode(text){
+      const delim = delimiterEl.value;
+      const codes = toCodePoints(text);
+      return codes.map(c=>formatNumber(c)).join(delim);
+    }
+
+    function parseToken(tok){
+      tok=tok.trim(); if(!tok) return NaN;
+      if(/^0x[0-9a-fA-F]+$/.test(tok)) return parseInt(tok,16);
+      if(/^0b[01]+$/.test(tok)) return parseInt(tok.slice(2),2);
+      if(/^[01]+$/.test(tok) && tok.length>8 && format==='bin') return parseInt(tok,2);
+      // allow hex without 0x when format is hex
+      if(format==='hex' && /^[0-9a-fA-F]+$/.test(tok)) return parseInt(tok,16);
+      // decimal fallback
+      if(/^[0-9]+$/.test(tok)) return parseInt(tok,10);
+      return NaN;
+    }
+
+    function decode(str){
+      // split by common separators: whitespace, comma, ;, |
+      const tokens = str.split(/[,;|\s]+/).filter(Boolean);
+      const chars = tokens.map(t=>{
+        const v=parseToken(t);
+        if(isNaN(v)) return '�';
+        try{return String.fromCodePoint(v)}catch(e){return '�'}
+      });
+      return chars.join('');
+    }
+
+    function pushHistory(inputVal){
+      history.push({input:inputVal,mode,format,delimiter:delimiterEl.value,t:Date.now()});
+      saveHistory(history);
+      renderHistory();
+    }
+
+    // 交互
+    runBtn.addEventListener('click', ()=>{exec();});
+    clearBtn.addEventListener('click', ()=>{inputEl.value='';outputEl.textContent='';outlen.textContent='0';});
+    pasteBtn.addEventListener('click', async ()=>{
+      try{const text = await navigator.clipboard.readText();inputEl.value = (inputEl.value?inputEl.value+'\n':'')+text}catch(e){alert('无法访问剪贴板')}
+    });
+
+    copyBtn.addEventListener('click', async ()=>{
+      try{await navigator.clipboard.writeText(outputEl.textContent);copyBtn.textContent='已复制';setTimeout(()=>copyBtn.textContent='复制',900)}catch(e){alert('复制失败')}
+    });
+
+    downloadBtn.addEventListener('click', ()=>{
+      const blob = new Blob([outputEl.textContent],{type:'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download='ascii-output.txt';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    });
+
+    selectAllBtn.addEventListener('click', ()=>{
+      const sel = window.getSelection();const range = document.createRange();range.selectNodeContents(outputEl);sel.removeAllRanges();sel.addRange(range);
+    });
+
+    document.querySelectorAll('.card .btn[data-sample]').forEach(b=>b.addEventListener('click', ()=>{inputEl.value=b.dataset.sample;}));
+
+    // 执行核心
+    function exec(){
+      const v = inputEl.value.trim();
+      if(!v){outputEl.textContent='';outlen.textContent='0';return}
+      let res='';
+      if(document.getElementById('mode-decode').classList.contains('active')){
+        res = decode(v);
+      }else{
+        res = encode(v);
+      }
+      outputEl.textContent = res;
+      outlen.textContent = res.length;
+      pushHistory(v);
+    }
+
+    // 快捷键
+    window.addEventListener('keydown', (e)=>{
+      if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='e'){e.preventDefault();setModeFromUI('encode');exec();}
+      if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='d'){e.preventDefault();setModeFromUI('decode');exec();}
+      if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='k'){e.preventDefault();inputEl.value='';outputEl.textContent='';outlen.textContent='0';}
+      if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='l'){e.preventDefault();delimiterEl.value=' ';}
+    });
+
+    // 小改进：输入时回车+shift执行（不覆盖默认shift+enter）
+    inputEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && (e.ctrlKey||e.metaKey)) {e.preventDefault();exec()} });
+
+    // 初始化UI值
+    setModeFromUI('encode');setFormatFromUI('dec');
+
+    // 允许外部恢复历史项设置的函数
+    window.setFormatFromUI = setFormatFromUI;window.setModeFromUI = setModeFromUI;
+  </script>
+</body>
+</html>
