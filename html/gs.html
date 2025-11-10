@@ -6,8 +6,17 @@
     <title>GitHub 搜索助手</title>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <style>
+        @font-face {
+            font-family: 'MyFont';
+            /* 自定义一个字体名称（随意起名） */
+            src: url('../font.ttf') format('truetype');
+            /* 根据实际路径调整 */
+            font-weight: normal;
+            font-style: normal;
+        }
+
         body {
-            font-family: Arial;
+            font-family: MyFont;
             max-width: 900px;
             margin: 20px auto;
             padding: 20px;
@@ -136,7 +145,6 @@
         .form-row-optional input {
             flex: 1 0 150px;
         }
-
     </style>
 </head>
 

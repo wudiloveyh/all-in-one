@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <title>URL 编解码工具</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+        @font-face {
+            font-family: 'MyFont';
+            /* 自定义一个字体名称（随意起名） */
+            src: url('../font.ttf') format('truetype');
+            /* 根据实际路径调整 */
+            font-weight: normal;
+            font-style: normal;
+        }
+
         :root {
             --primary-color: #2563eb;
             --bg-color: #f9fafb;
@@ -15,7 +25,7 @@
         }
 
         body {
-            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            font-family: "MyFont", "PingFang SC", "Microsoft YaHei", sans-serif;
             background: var(--bg-color);
             color: var(--text-color);
             margin: 0;
@@ -129,6 +139,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>🔗 URL 编解码工具</h1>
@@ -181,4 +192,5 @@
         });
     </script>
 </body>
+
 </html>
