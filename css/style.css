@@ -1,67 +1,107 @@
+/* ===== 全局样式 ===== */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f4f4;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #f2faff 0%, #ffffff 100%);
     margin: 0;
-    padding: 20px;
+    padding: 0;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    align-items: flex-start;
 }
 
+/* ===== 主容器 ===== */
 .root {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    padding: 40px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 40px 30px 50px;
+    margin-top: 60px;
     text-align: center;
-    width: 300px;
+    width: 90%;
+    max-width: 900px;
+    transition: all 0.3s ease;
 }
 
+/* ===== 标题 ===== */
 h1 {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    color: #333;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    color: #1f2937;
+    letter-spacing: 1px;
+    position: relative;
 }
 
-input[type="text"] {
-    width: 276px;  /* 输入框的宽度 */
-    padding: 12px;  /* 输入框的内边距 */
-    border: 1px solid #ccc;  /* 输入框边框 */
-    border-radius: 5px;  /* 输入框圆角 */
-    transition: border-color 0.3s, box-shadow 0.3s;  /* 交互效果 */
-    outline: none;
-}
-input[type="text"]:hover {
-    border-color: #84b997;  /* 聚焦时边框颜色 */
-    box-shadow: 0 0 5px rgba(132, 185, 151, 0.5);  /* 聚焦时阴影效果 */
-}
-input[type="text"]:focus {
-    border-color: #84b997;  /* 聚焦时边框颜色 */
-    box-shadow: 0 0 5px rgba(132, 185, 151, 0.5);  /* 聚焦时阴影效果 */
-}
-
-a {
+h1::after {
+    content: '';
     display: block;
-    margin: 10px 0;
-    padding: 12px;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #84b997, #a1d8b1);
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
+
+/* ===== 搜索框 ===== */
+input[type="text"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1.5px solid #d0e6da;
+    border-radius: 8px;
+    outline: none;
+    font-size: 0.95rem;
+    background-color: #f8fbf9;
+    transition: all 0.3s ease;
+    margin-bottom: 25px;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus {
+    border-color: #84b997;
+    box-shadow: 0 0 8px rgba(132, 185, 151, 0.4);
+    background-color: #ffffff;
+}
+
+/* ===== 工具网格容器（关键部分） ===== */
+.tool-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    /* 自动多列布局 */
+    gap: 16px;
+    margin-top: 10px;
+}
+
+/* ===== 工具卡片 ===== */
+a.tool {
+    display: block;
+    padding: 16px 10px;
     text-decoration: none;
-    color: #000;
-    background-color: #daf7e3;  /* 链接背景颜色 */
-    border-radius: 5px;
-    transition: background-color 0.3s;
+    color: #1f2937;
+    background: #eafaf0;
+    border: 1px solid #d8f0df;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all 0.25s ease;
+    text-align: center;
 }
 
-a:hover {
-    background-color: #84b997;  /* 链接悬停时背景颜色 */
+a.tool:hover {
+    color: #0e4631;
+    background: #cfeede;
+    border-color: #bde0cd;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(132, 185, 151, 0.3);
 }
 
-.selected {
-    background-color: #ffe8e7; /* 高亮颜色 */
-}
-
-@media (max-width: 400px) {
+/* ===== 响应式优化 ===== */
+@media (max-width: 600px) {
     .root {
-        width: 90%;  /* 响应式宽度 */
+        padding: 25px 20px;
+        margin-top: 40px;
+    }
+
+    .tool-container {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
     }
 }
