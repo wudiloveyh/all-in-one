@@ -16,16 +16,16 @@
         }
 
         :root {
-            --bg: #0f1724;
-            --card: #0b1220;
-            --muted: #9aa6b2;
-            --accent: #06b6d4;
-            --glass: rgba(255, 255, 255, 0.03);
+            --bg: #f7fafc;
+            --card: #ffffff;
+            --muted: #64748b;
+            --accent: #2563eb;
+            --glass: rgba(0, 0, 0, 0.03);
             --radius: 14px;
             --soft: 12px;
             --gap: 16px;
-            --shadow: 0 6px 20px rgba(2, 6, 23, 0.6);
-            color-scheme: dark;
+            --shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            color-scheme: light;
         }
 
         * {
@@ -36,9 +36,9 @@
         body {
             height: 100%;
             margin: 0;
-            font-family: 'Myfont', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-            color: #e6eef3;
-            background: linear-gradient(180deg, #071022 0%, #071524 50%, #031119 100%);
+            font-family: Myfont, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+            color: #1e293b;
+            background: linear-gradient(180deg, #e2e8f0 0%, #f1f5f9 100%);
         }
 
         .wrap {
@@ -46,7 +46,7 @@
             margin: 36px auto;
             padding: 28px;
             border-radius: 20px;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.8));
             box-shadow: var(--shadow);
         }
 
@@ -58,7 +58,8 @@
 
         header h1 {
             margin: 0;
-            font-size: 20px
+            font-size: 20px;
+            color: #0f172a
         }
 
         header p {
@@ -66,6 +67,7 @@
             color: var(--muted);
             font-size: 13px
         }
+
 
         .grid {
             display: grid;
@@ -78,7 +80,7 @@
             background: var(--card);
             border-radius: var(--radius);
             padding: 16px;
-            box-shadow: 0 4px 14px rgba(2, 6, 23, 0.45);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
         }
 
         label {
@@ -94,11 +96,12 @@
             resize: vertical;
             padding: 14px;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), transparent);
-            color: #eaf6ff;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: #1e293b;
             font-size: 14px
         }
+
 
         .controls {
             display: flex;
@@ -109,23 +112,34 @@
 
         .btn {
             background: var(--glass);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            color: #dff6fb;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            color: #1e293b;
             padding: 8px 12px;
             border-radius: 10px;
             font-weight: 600;
-            cursor: pointer
+            cursor: pointer;
+            transition: 0.2s
         }
 
         .btn.primary {
             background: linear-gradient(90deg, var(--accent), #60a5fa);
-            color: #042024
+            color: white;
+            border: none
+        }
+
+        .btn:hover {
+            background: rgba(0, 0, 0, 0.05)
+        }
+
+        .btn.primary:hover {
+            opacity: 0.9
         }
 
         .small {
             padding: 6px 8px;
             font-size: 13px
         }
+
 
         .row {
             display: flex;
@@ -135,10 +149,10 @@
 
         .seg {
             display: inline-flex;
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(0, 0, 0, 0.03);
             border-radius: 10px;
             padding: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.02)
+            border: 1px solid rgba(0, 0, 0, 0.05)
         }
 
         .seg button {
@@ -151,9 +165,10 @@
         }
 
         .seg button.active {
-            background: rgba(255, 255, 255, 0.03);
-            color: #eaf6ff
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--accent)
         }
+
 
         .meta {
             display: flex;
@@ -167,17 +182,19 @@
             font-size: 13px
         }
 
+
         pre.output {
             white-space: pre-wrap;
             word-break: break-word;
             min-height: 160px;
             padding: 14px;
             border-radius: 10px;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.02));
-            color: #eaf6ff;
-            border: 1px solid rgba(255, 255, 255, 0.02);
+            background: #f8fafc;
+            color: #1e293b;
+            border: 1px solid #cbd5e1;
             font-size: 14px
         }
+
 
         .footer {
             display: flex;
@@ -194,15 +211,15 @@
             margin-top: 10px;
             padding: 10px;
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid rgba(255, 255, 255, 0.02)
+            background: #f8fafc;
+            border: 1px solid #e2e8f0
         }
 
         .history-item {
             padding: 8px;
             border-radius: 8px;
             margin-bottom: 6px;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), transparent);
+            background: #f1f5f9;
             display: flex;
             justify-content: space-between;
             align-items: center
@@ -212,9 +229,10 @@
             font-size: 12px;
             padding: 6px 8px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.02);
+            background: #e2e8f0;
             color: var(--muted)
         }
+
 
         .top-actions {
             display: flex;
@@ -223,13 +241,14 @@
         }
 
         .kbd {
-            background: rgba(255, 255, 255, 0.03);
+            background: #f1f5f9;
             padding: 6px 8px;
             border-radius: 6px;
             font-weight: 700;
             color: var(--muted);
             font-size: 12px
         }
+
 
         @media (max-width:900px) {
             .grid {
