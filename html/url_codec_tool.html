@@ -3,10 +3,21 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>URL 编解码工具</title>
+    <title>URL 编解码工具 | 极致体验创新版</title>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        :root {
+            --main: #1a3b5d;
+            --fade: #b6dcfa;
+            --accent: #fb8c00;
+            --bg: #f3f7fa;
+            --card: white;
+            --shadow: 0 12px 40px 0 #57a7ff0f;
+            --btn: #fb8c00;
+            --btn-hover: #be670a;
+        }
+
         @font-face {
             font-family: 'MyFont';
             /* 自定义一个字体名称（随意起名） */
@@ -16,181 +27,538 @@
             font-style: normal;
         }
 
-        :root {
-            --primary-color: #2563eb;
-            --bg-color: #f9fafb;
-            --card-color: #ffffff;
-            --text-color: #1f2937;
-            --border-color: #e5e7eb;
-            --success-color: #10b981;
-        }
-
         body {
-            font-family: "MyFont", '华文仿宋', "PingFang SC", "Microsoft YaHei", sans-serif;
-            background: var(--bg-color);
-            color: var(--text-color);
+            background: linear-gradient(120deg, #e3f0ff 0%, #fbffe5 100%);
+            min-height: 100vh;
             margin: 0;
+            font-family: 'MyFont';
+            color: var(--main);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
+            justify-content: center;
         }
 
-        .container {
-            background: var(--card-color);
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
-            border-radius: 16px;
-            padding: 30px;
-            width: 90%;
-            max-width: 600px;
-            transition: all 0.3s ease;
+        .url-card {
+            margin-top: 6vw;
+            min-width: 340px;
+            width: 680px;
+            max-width: 98vw;
+            border-radius: 34px;
+            box-shadow: var(--shadow);
+            background: var(--card);
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+            transition: box-shadow .48s cubic-bezier(.3, .8, .43, 1.07), background 0.4s;
+            position: relative;
         }
 
-        .container:hover {
-            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.12);
+        .card-col {
+            flex: 1 1 0;
+            min-height: 360px;
+            display: flex;
+            flex-direction: column;
+            padding: 48px 30px 38px;
+            background: rgba(255, 255, 255, 0.94);
+            transition: background 0.36s;
+            position: relative;
         }
 
-        h1 {
-            text-align: center;
+        .card-col:not(:last-child) {
+            border-right: 1.5px solid #e2e8ef;
+        }
+
+        .card-col h2 {
+            margin: 0 0 10px 0;
             font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 25px;
+            letter-spacing: 1.5px;
+            color: #e7a227;
+            font-size: 1.13rem;
+            display: flex;
+            align-items: center;
+            min-height: 28px;
+        }
+
+        .card-col .col-row {
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: .93em;
+            color: #888;
+            user-select: none;
+        }
+
+        .action-bar {
+            margin-top: 18px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--btn);
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 8px 22px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 1px 10px #fb8c003a;
+            overflow: hidden;
+            outline: none;
+            transition: background 0.21s, transform 0.35s cubic-bezier(.35, 1.3, .56, 1), box-shadow 0.27s;
+        }
+
+        .btn:hover,
+        .btn:focus {
+            background: var(--btn-hover);
+            transform: scale(1.04) translateY(-2px);
+            box-shadow: 0 4px 20px #fb8c0035;
+        }
+
+        .btn:active {
+            background: #f3b357;
+            color: #704200;
+        }
+
+        .btn.ripple::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.38);
+            opacity: 0;
+            transform: scale(1) translate(-50%, -50%);
+            pointer-events: none;
+            transition: all 0.6s cubic-bezier(.2, .7, .4, 1);
+        }
+
+        .btn.ripple:active::after {
+            width: 120px;
+            height: 120px;
+            opacity: .26;
+            background: rgba(255, 255, 255, 0.68);
+        }
+
+        .clear-btn {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            z-index: 2;
+            background: none;
+            border: none;
+            color: #c6bfbf;
+            font-size: 1.18em;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 6px;
+            transition: color .19s, background .21s;
+        }
+
+        .clear-btn:hover,
+        .clear-btn:focus {
+            background: #ffeceb;
+            color: #fb8c00;
         }
 
         textarea {
+            resize: none;
             width: 100%;
             box-sizing: border-box;
-            height: 120px;
-            padding: 12px 14px;
-            font-size: 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            resize: vertical;
+            min-height: 120px;
+            flex: 1 1 0;
+            border: none;
+            background: #f8fafd;
+            border-radius: 12px;
+            font-size: 1.04rem;
+            padding: 16px 13px;
+            line-height: 1.55;
+            color: var(--main);
+            box-shadow: 0 2px 14px 0 rgba(11, 60, 100, 0.035) inset;
+            transition: box-shadow 0.37s, background 0.29s;
             outline: none;
-            transition: border-color 0.2s ease;
+            margin: 8px 0 20px;
         }
 
         textarea:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+            box-shadow: 0 6px 34px 0 #f8a85523, 0 2px 14px 0 rgba(18, 83, 100, 0.04) inset;
+            background: #fff;
         }
 
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin: 20px 0;
-        }
-
-        button {
-            background: var(--primary-color);
-            color: #fff;
-            border: none;
-            padding: 10px 24px;
-            font-size: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        button:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-        }
-
-        .copy-btn {
-            background: #10b981;
-        }
-
-        .copy-btn:hover {
-            background: #059669;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-        }
-
-        .result-box {
-            background: #f3f4f6;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 14px;
-            font-size: 15px;
-            min-height: 60px;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-
-        .footer {
-            text-align: center;
-            font-size: 13px;
-            color: #9ca3af;
-            margin-top: 15px;
-        }
-
-        .toast {
-            text-align: center;
-            font-size: 14px;
-            color: var(--success-color);
-            margin-top: 8px;
+        .copied-bar {
+            font-size: 0.98em;
+            margin-left: 4px;
+            color: #3bc26f;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: color 0.3s, opacity 0.6s;
+            pointer-events: none;
+            user-select: none;
         }
 
-        .toast.show {
+        .copied-bar.active {
             opacity: 1;
+            font-weight: 800;
+            color: #1dc47f;
+            transition: opacity 0.33s, color .1s;
+        }
+
+        .divider-v {
+            width: 2.1px;
+            background: linear-gradient(105deg, #fb8c00bb 0%, #ffe08288 100%);
+            height: 74%;
+            align-self: center;
+            border-radius: 16px;
+            opacity: 0.12;
+            margin: 0 0 0 0;
+            transition: height 0.3s;
+        }
+
+        /* 动画与布局切换 */
+        .switch-btn {
+            border: none;
+            outline: none;
+            background: none;
+            font-size: 1.2em;
+            color: var(--accent);
+            margin: 0 0 0 6px;
+            cursor: pointer;
+            border-radius: 9px;
+            transition: background 0.21s, color 0.18s;
+            padding: 1px 8px 1px 6px;
+        }
+
+        .switch-btn:hover,
+        .switch-btn:focus {
+            background: #fff5e1;
+            color: #be670a;
+        }
+
+        .fade-swap {
+            animation: fadeSwap 0.38s cubic-bezier(.22, 1.2, .7, 1.05);
+        }
+
+        @keyframes fadeSwap {
+            0% {
+                opacity: 0.7;
+                transform: scaleX(0.96) translateY(18px);
+            }
+
+            80% {
+                opacity: 0.97;
+                transform: scale(1.02);
+            }
+
+            100% {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        /* 清空动画 */
+        .cleared-anim {
+            animation: cleared 0.35s cubic-bezier(.22, .94, .64, 1.22);
+        }
+
+        @keyframes cleared {
+            0% {
+                background: #ffe2b7;
+            }
+
+            65% {
+                background: #ffe2b7;
+            }
+
+            100% {
+                background: #f8fafd;
+            }
+        }
+
+        /* 错误动画 */
+        .error-anim {
+            animation: errorWiggle 0.36s cubic-bezier(.4, 1.23, .77, 1.27);
+            background: #fff8e9 !important;
+            border: 1.5px solid #fe5881 !important;
+        }
+
+        @keyframes errorWiggle {
+            0% {
+                transform: translateX(0);
+            }
+
+            23% {
+                transform: translateX(-7px);
+            }
+
+            48% {
+                transform: translateX(7px);
+            }
+
+            73% {
+                transform: translateX(-5px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .tip {
+            font-size: .94em;
+            color: #bfa454;
+            margin-top: 15px;
+            text-align: left;
+            line-height: 1.45;
+            font-weight: 450;
+            letter-spacing: .2px;
+        }
+
+        @media (max-width: 720px) {
+            .url-card {
+                flex-direction: column;
+                width: 99vw;
+                min-width: 120px;
+            }
+
+            .card-col {
+                padding: 24px 4vw 16px;
+            }
+
+            .divider-v {
+                width: 65vw;
+                height: 2.4px;
+                min-height: 12px;
+                margin: 16px 0 0 0;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .url-card {
+                border-radius: 13px;
+                margin-top: 10px;
+            }
+
+            .card-col {
+                padding: 8vw 2vw 14vw;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>🔗 URL 编解码工具</h1>
-        <textarea id="inputText" placeholder="请输入要编码或解码的文本..."></textarea>
-        <div class="buttons">
-            <button id="encodeBtn">编码</button>
-            <button id="decodeBtn">解码</button>
-            <button id="copyBtn" class="copy-btn">复制结果</button>
-        </div>
-        <div class="result-box" id="result">结果将在此显示...</div>
-        <div class="toast" id="toast">✅ 已复制到剪贴板！</div>
-        <div class="footer">Made with 💙 by 初雪</div>
+    <div class="url-card" id="urlCard">
+        <!-- 编码区/解码区（左，可交换顺序） -->
+        <section class="card-col" id="inputCol">
+            <button class="clear-btn" id="clearInput" aria-label="清空输入" title="清空输入">✕</button>
+            <h2 id="inputLabel">原始内容（自动URL编码）</h2>
+            <div class="col-row">
+                <span id="inputMode">编码</span>
+                <button class="switch-btn" id="swapBtn" title="切换方向">⇄ 切换</button>
+            </div>
+            <textarea id="inputArea" placeholder="输入内容，如：https://domain.com/你好.html?xx=张三" aria-label="原文"></textarea>
+            <div class="action-bar">
+                <button class="btn ripple" id="encodeBtn">编码 ▶️</button>
+            </div>
+        </section>
+        <aside class="divider-v"></aside>
+        <!-- 编码结果/解码结果区 -->
+        <section class="card-col" id="outputCol">
+            <button class="clear-btn" id="clearOutput" aria-label="清空输出" title="清空输出">✕</button>
+            <h2 id="outputLabel">编码结果（自动解码）</h2>
+            <div class="col-row">
+                <span id="outputMode">解码</span>
+                <span class="copied-bar" id="copyMark">已复制！</span>
+            </div>
+            <textarea id="outputArea" placeholder="自动获得 URL 编码结果" readonly aria-readonly="true"></textarea>
+            <div class="action-bar">
+                <button class="btn ripple" id="copyBtn" title="复制结果">📋 复制</button>
+            </div>
+        </section>
     </div>
-
     <script>
-        const input = document.getElementById('inputText');
-        const result = document.getElementById('result');
+        // 获取DOM
+        const inputArea = document.getElementById('inputArea');
+        const outputArea = document.getElementById('outputArea');
+        const encodeBtn = document.getElementById('encodeBtn');
         const copyBtn = document.getElementById('copyBtn');
-        const toast = document.getElementById('toast');
+        const swapBtn = document.getElementById('swapBtn');
+        const inputLabel = document.getElementById('inputLabel');
+        const outputLabel = document.getElementById('outputLabel');
+        const inputMode = document.getElementById('inputMode');
+        const outputMode = document.getElementById('outputMode');
+        const copyMark = document.getElementById('copyMark');
+        const clearInput = document.getElementById('clearInput');
+        const clearOutput = document.getElementById('clearOutput');
+        const urlCard = document.getElementById('urlCard');
 
-        document.getElementById('encodeBtn').addEventListener('click', () => {
-            const text = input.value.trim();
-            if (!text) return result.textContent = '⚠️ 请输入要编码的内容。';
-            result.textContent = encodeURIComponent(text);
-        });
+        // 状态控制
+        let encodeDirect = true;  // true=编码模式，false=解码模式
+        let isSyncing = false;
 
-        document.getElementById('decodeBtn').addEventListener('click', () => {
-            const text = input.value.trim();
-            if (!text) return result.textContent = '⚠️ 请输入要解码的内容。';
+        // 编码解码函数
+        function urlEncode(str) {
             try {
-                result.textContent = decodeURIComponent(text);
-            } catch {
-                result.textContent = '❌ 解码失败，请输入有效的 URL 编码文本。';
+                return encodeURIComponent(str)
+            } catch (e) {
+                return '';
             }
+        }
+        function urlDecode(str) {
+            try {
+                return decodeURIComponent(str)
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // 联动同步处理
+        function syncRealtime() {
+            if (isSyncing) return;
+            isSyncing = true;
+            let input = inputArea.value;
+            let out = '';
+            if (encodeDirect) {  // 编码
+                if (!input) {
+                    outputArea.value = '';
+                    outputArea.classList.remove('error-anim');
+                } else {
+                    try {
+                        out = urlEncode(input);
+                        outputArea.value = out;
+                        outputArea.classList.remove('error-anim');
+                    } catch {
+                        outputArea.value = '';
+                        outputArea.classList.add('error-anim');
+                    }
+                }
+            } else {            // 解码
+                if (!input) {
+                    outputArea.value = '';
+                    inputArea.classList.remove('error-anim');
+                    outputArea.classList.remove('error-anim');
+                } else {
+                    let dec = urlDecode(input);
+                    if (dec === null) {
+                        outputArea.value = '[解码失败] 非法URL编码';
+                        outputArea.classList.add('error-anim');
+                        inputArea.classList.add('error-anim');
+                    } else {
+                        outputArea.value = dec;
+                        outputArea.classList.remove('error-anim');
+                        inputArea.classList.remove('error-anim');
+                    }
+                }
+            }
+            isSyncing = false;
+        }
+
+        // 输入事件
+        inputArea.addEventListener('input', syncRealtime);
+
+        // 按钮编解码
+        encodeBtn.addEventListener('click', () => {
+            syncRealtime();
+            outputArea.classList.add('fade-swap');
+            setTimeout(() => { outputArea.classList.remove('fade-swap') }, 340);
+            outputArea.focus();
+            outputArea.select();
         });
 
-        copyBtn.addEventListener('click', async () => {
-            const text = result.textContent.trim();
-            if (!text || text.startsWith('⚠️') || text.startsWith('❌') || text === '结果将在此显示...') {
-                toast.textContent = '⚠️ 没有可复制的内容。';
-                toast.style.color = '#f59e0b';
+        // 复制
+        copyBtn.addEventListener('click', () => {
+            outputArea.select();
+            document.execCommand('copy');
+            copyMark.classList.add('active');
+            setTimeout(() => copyMark.classList.remove('active'), 1050);
+        });
+
+        // 切换方向
+        swapBtn.addEventListener('click', () => {
+            encodeDirect = !encodeDirect;
+            // 交换标题与placeholder与模式指示
+            if (encodeDirect) {
+                inputLabel.textContent = '原始内容（自动URL编码）';
+                outputLabel.textContent = '编码结果（自动解码）';
+                inputArea.placeholder = '输入内容，如：https://www.domain.com/中文?x=张三';
+                outputArea.placeholder = '自动获得 URL 编码结果';
+                inputMode.textContent = '编码';
+                outputMode.textContent = '解码';
+                encodeBtn.textContent = '编码 ▶️';
             } else {
-                await navigator.clipboard.writeText(text);
-                toast.textContent = '✅ 已复制到剪贴板！';
-                toast.style.color = '#10b981';
+                inputLabel.textContent = '原始内容（自动URL解码）';
+                outputLabel.textContent = '解码结果（自动编码）';
+                inputArea.placeholder = '输入URL编码内容，如：%E5%BC%A0%E4%B8%89';
+                outputArea.placeholder = '自动获得 URL 解码原文';
+                inputMode.textContent = '解码';
+                outputMode.textContent = '编码';
+                encodeBtn.textContent = '解码 ▶️';
             }
-
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 1800);
+            // 动画
+            inputArea.classList.add('fade-swap');
+            outputArea.classList.add('fade-swap');
+            setTimeout(() => {
+                inputArea.classList.remove('fade-swap');
+                outputArea.classList.remove('fade-swap');
+            }, 340);
+            // 自动刷新
+            syncRealtime();
         });
+
+        // 清空输入输出
+        function clearTextarea(ele) {
+            ele.value = '';
+            ele.classList.remove('cleared-anim');
+            void ele.offsetWidth;
+            ele.classList.add('cleared-anim');
+            setTimeout(() => ele.classList.remove('cleared-anim'), 440);
+            syncRealtime();
+        }
+        clearInput.addEventListener('click', () => {
+            clearTextarea(inputArea);
+            inputArea.focus();
+        });
+        clearOutput.addEventListener('click', () => {
+            clearTextarea(outputArea);
+            outputArea.blur();
+        });
+
+        // 粘贴文件内容直接读到输入框
+        inputArea.addEventListener('paste', function (e) {
+            const items = (e.clipboardData || window.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].kind === 'file') {
+                    e.preventDefault();
+                    const file = items[i].getAsFile();
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (evt) {
+                            inputArea.value = evt.target.result;
+                            syncRealtime();
+                        }
+                        reader.readAsText(file, 'utf-8');
+                    }
+                }
+            }
+        });
+
+        // 选中自动编/解码
+        window.onload = () => {
+            inputArea.value = '';
+            outputArea.value = '';
+            inputArea.placeholder = '输入内容，如：https://domain.com/你好.html?xx=张三';
+            outputArea.placeholder = '自动获得 URL 编码结果';
+            encodeDirect = true;
+            syncRealtime();
+        };
     </script>
 </body>
 

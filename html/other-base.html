@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Base全家桶编解码器</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --main-gradient: linear-gradient(120deg, #ffecd2 0%, #fcb69f 100%);
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --glass-blur: 14px;
+            --border-radius: 24px;
+            --shadow: 0 6px 32px 0 rgba(151, 151, 151, 0.12);
+            --border: 1.4px solid #fff6;
+            --theme-accent: #fb6332;
+            --theme-hover: #ffe1cf;
+            --text-main: #222;
+            --text-fade: #888;
+            --font: 'Poppins', 'Helvetica Neue', 'sans-serif';
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--main-gradient);
+            font-family: var(--font);
+            color: var(--text-main);
+            transition: background 1s;
+            animation: rainbow-bg 14s linear infinite alternate;
+        }
+
+        @keyframes rainbow-bg {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 100vw 50vh;
+            }
+        }
+
+        .header {
+            text-align: center;
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin-top: 40px;
+            background: linear-gradient(90deg, #fb6332, #feb47b, #fb6332 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            letter-spacing: 3px;
+            user-select: none;
+            animation: bg-title 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes bg-title {
+            from {
+                letter-spacing: 2px;
+            }
+
+            to {
+                letter-spacing: 10px;
+            }
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 32px;
+            margin: 0 auto 35px auto;
+            max-width: 1100px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: var(--border);
+            backdrop-filter: blur(var(--glass-blur));
+            padding: 2rem;
+            min-width: 320px;
+            max-width: 410px;
+            flex: 1 1 360px;
+            transition: box-shadow .22s cubic-bezier(.4, 1.4, .4, 1), transform .22s;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 32px;
+            outline: 0 solid var(--theme-accent);
+            z-index: 1;
+        }
+
+        .card:hover {
+            outline: 5px solid var(--theme-hover);
+            box-shadow: 0 10px 40px 4px #fff4, 0 6px 40px 0 #fdcdaf99;
+            transform: scale(1.04) rotate(-1deg);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--theme-accent);
+            letter-spacing: .4px;
+            margin-bottom: 15px;
+        }
+
+        .base-select-group {
+            display: flex;
+            gap: .8rem;
+            margin-bottom: .9rem;
+            flex-wrap: wrap;
+        }
+
+        .base-button {
+            background: none;
+            border: 2px solid transparent;
+            padding: .33em .9em;
+            border-radius: 32px;
+            color: var(--theme-accent);
+            font-weight: bold;
+            cursor: pointer;
+            transition: background .18s, border .2s, color .1s;
+            font-size: .98em;
+            user-select: none;
+        }
+
+        .base-button.active,
+        .base-button:hover {
+            background: var(--theme-hover);
+            border: 2px solid var(--theme-accent);
+        }
+
+        .textarea-group {
+            position: relative;
+            margin-bottom: 1.1rem;
+        }
+
+        .textarea {
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 72px;
+            resize: vertical;
+            font: inherit;
+            font-size: 1.18rem;
+            border-radius: 13px;
+            border: 1.2px solid #fff7;
+            background: rgba(255, 255, 255, 0.52);
+            padding: .7em .8em;
+            box-shadow: 0 2px 12px 0 #fdcdaf13;
+            margin-bottom: 5px;
+            transition: border .2s, box-shadow .2s;
+            color: #111;
+            outline: none;
+        }
+
+        .textarea:focus {
+            border: 2px solid var(--theme-accent);
+            box-shadow: 0 0 24px 0 #fb633244;
+        }
+
+        .code-output {
+            background: rgba(255, 251, 240, 0.7);
+            border-radius: 11px;
+            font-family: 'Fira Mono', 'JetBrains Mono', monospace;
+            padding: .7em .8em;
+            margin-top: .5em;
+            margin-bottom: 0;
+            min-height: 57px;
+            border: 1.2px solid #ffe6db;
+            position: relative;
+            transition: border .2s;
+            word-break: break-all;
+            font-size: 1.09rem;
+            color: var(--theme-accent);
+        }
+
+        .copy-btn {
+            position: absolute;
+            right: 9px;
+            top: 7px;
+            background: #fff2e0de;
+            border: none;
+            border-radius: 7px;
+            padding: 3px 9px 3px 9px;
+            font-family: inherit;
+            font-size: .93em;
+            cursor: pointer;
+            color: #fb6332;
+            font-weight: 600;
+            box-shadow: 0 2px 6px #fcb69f33;
+            transition: background .17s;
+        }
+
+        .copy-btn:hover {
+            background: #fcb69f66;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.3em;
+        }
+
+        .action-btn {
+            background: linear-gradient(93deg, #fb6332, #ff9966);
+            color: #fff;
+            font-size: 1.12em;
+            font-weight: bold;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 3px 14px #feb47b2b;
+            padding: 0.66em 1.3em;
+            cursor: pointer;
+            transition: box-shadow .16s, background .23s, transform .08s;
+            outline: none;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px) scale(1.025);
+            background: linear-gradient(114deg, #ffb88c, #fb6332);
+        }
+
+        .tips {
+            font-size: .97em;
+            color: var(--text-fade);
+            margin-top: .4em;
+            margin-bottom: .1em;
+            opacity: .93;
+            user-select: none;
+        }
+
+        footer {
+            margin-bottom: 22px;
+            color: #b88450;
+            text-align: center;
+            font-size: 1.02rem;
+            opacity: .8;
+            letter-spacing: .6px;
+            font-family: var(--font);
+        }
+
+        .glass-shine {
+            position: absolute;
+            left: -30%;
+            top: -30%;
+            width: 180%;
+            height: 280%;
+            background: linear-gradient(115deg, rgba(255, 255, 255, 0.19) 28%, rgba(255, 180, 128, 0.11) 70%);
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(14px);
+            animation: shine-move 4.4s cubic-bezier(.7, .1, .2, .9) infinite alternate;
+        }
+
+        @keyframes shine-move {
+            from {
+                transform: rotate(-12deg) scale(1);
+            }
+
+            to {
+                transform: rotate(8deg) scale(1.03);
+            }
+        }
+
+        @media (max-width: 850px) {
+            .container {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .card {
+                margin-top: 0;
+                margin-bottom: 22px;
+                max-width: 99vw;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            height: 10px;
+            width: 8px;
+            background: #ffecd2a1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #fcb69fcf;
+            border-radius: 7px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">Base家族·全能极致体验</div>
+    <div class="container">
+        <div class="card" id="base-card">
+            <div class="glass-shine"></div>
+            <div class="card-title">
+                🔗 Base 编解码<br><span style="font-size:0.84em;font-weight:400;color:#b88450;">全平台支持，随心选择</span>
+            </div>
+            <div class="base-select-group" id="base-types"></div>
+            <div class="textarea-group">
+                <textarea class="textarea" id="inputText" placeholder="在这里输入需要编/解码的内容..."></textarea>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" id="encodeBtn">🔥 编码 Encode</button>
+                <button class="action-btn" id="decodeBtn">🎉 解码 Decode</button>
+            </div>
+            <div class="tips" id="actionMsg"></div>
+            <div class="textarea-group" style="margin-top:1.25rem;">
+                <span class="tips">
+                    输出结果
+                    <button class="copy-btn" id="copyBtn" title="复制输出数据~">复制</button>
+                </span>
+                <div class="code-output" id="outputText"></div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        🚀 Base16/32/36/58/62/64/85全面支持 | Made with ❤️ by Copilot & wudiloveyh
+    </footer>
+    <script>
+        // base家族常用实现 (含自定义编码表和用途注释)
+        const baseTypes = [
+            { name: 'Base16', value: 'base16', desc: '十六进制', icon: '🔶' }, //hex
+            { name: 'Base32', value: 'base32', desc: '常见于TOTP', icon: '🧩' },
+            { name: 'Base36', value: 'base36', desc: '字母数字短码', icon: '🧃' },
+            { name: 'Base58', value: 'base58', desc: '区块链/比特币', icon: '⛓️' },
+            { name: 'Base62', value: 'base62', desc: '短链ID/邀请码', icon: '🔢' },
+            { name: 'Base64', value: 'base64', desc: '最常见的传输', icon: '🌏' },
+            { name: 'Base85', value: 'base85', desc: '高效编码', icon: '🧬' },
+        ];
+        // 编码表: base58, base62等
+        const ALPHABET = {
+            base58: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz',
+            base62: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+        };
+        function toUtf8Bytes(str) {
+            return new TextEncoder().encode(str);
+        }
+        function fromUtf8Bytes(bytes) {
+            return new TextDecoder().decode(Uint8Array.from(bytes));
+        }
+        // base16实现
+        function encodeBase16(text) {
+            return Array.from(toUtf8Bytes(text)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        function decodeBase16(text) {
+            if (!/^([a-fA-F0-9]{2})+$/.test(text)) throw '输入不是合法base16编码';
+            return fromUtf8Bytes(text.match(/.{2}/g).map(x => parseInt(x, 16)));
+        }
+        // base32 RFC4648标准
+        function encodeBase32(text) {
+            const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+            let bytes = toUtf8Bytes(text), out = "", bits = 0, val = 0;
+            for (let i = 0; i < bytes.length; i++) {
+                val = (val << 8) | bytes[i], bits += 8;
+                while (bits >= 5) out += ALPHABET[(val >>> (bits -= 5)) & 31];
+            }
+            if (bits > 0) out += ALPHABET[(val << (5 - bits)) & 31];
+            while (out.length % 8) out += '=';
+            return out;
+        }
+        function decodeBase32(str) {
+            const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+            let cleaned = str.replace(/=+$/, "").toUpperCase(), bits = 0, val = 0, idx = 0;
+            let out = [];
+            for (let char of cleaned) {
+                let t = ALPHABET.indexOf(char);
+                if (t === -1) continue;
+                val = (val << 5) | t; bits += 5;
+                if (bits >= 8) out.push((val >>> (bits -= 8)) & 255);
+            }
+            return fromUtf8Bytes(out);
+        }
+        // base36
+        function encodeBase36(text) {
+            let b = toUtf8Bytes(text), n = BigInt('0x' + Array.from(b).map(x => x.toString(16).padStart(2, '0')).join(''));
+            return n.toString(36);
+        }
+        function decodeBase36(text) {
+            let n;
+            try {
+                n = BigInt('0x' + BigInt(parseInt(text, 36)).toString(16));
+            } catch {
+                throw "输入不是合法base36编码";
+            }
+            let hex = n.toString(16); if (hex.length % 2) hex = '0' + hex;
+            let out = []; for (let i = 0; i < hex.length; i += 2)out.push(parseInt(hex.slice(i, i + 2), 16));
+            return fromUtf8Bytes(out);
+        }
+        // base58
+        function encodeBase58(text) {
+            let bytes = toUtf8Bytes(text);
+            let n = BigInt('0x' + Array.from(bytes).map(x => x.toString(16).padStart(2, '0')).join(''));
+            let chars = ALPHABET.base58, res = '';
+            while (n > 0) {
+                res = chars[n % 58n] + res; n /= 58n;
+            }
+            for (let b of bytes) if (b) break; else res = '1' + res;
+            return res;
+        }
+        function decodeBase58(str) {
+            let chars = ALPHABET.base58, n = 0n;
+            for (let c of str) {
+                let idx = chars.indexOf(c);
+                if (idx < 0) throw "输入不是合法base58编码";
+                n = n * 58n + BigInt(idx);
+            }
+            let hex = n.toString(16);
+            if (hex.length % 2) hex = '0' + hex;
+            let out = [];
+            for (let i = 0; i < hex.length; i += 2) out.push(parseInt(hex.slice(i, i + 2), 16));
+            return fromUtf8Bytes(out);
+        }
+        // base62
+        function encodeBase62(text) {
+            let bytes = toUtf8Bytes(text);
+            let n = BigInt('0x' + Array.from(bytes).map(x => x.toString(16).padStart(2, '0')).join(''));
+            let chars = ALPHABET.base62, res = '';
+            while (n > 0) {
+                res = chars[n % 62n] + res; n /= 62n;
+            }
+            for (let b of bytes) if (b) break; else res = '0' + res;
+            return res;
+        }
+        function decodeBase62(str) {
+            let chars = ALPHABET.base62, n = 0n;
+            for (let c of str) {
+                let idx = chars.indexOf(c);
+                if (idx < 0) throw "输入不是合法base62编码";
+                n = n * 62n + BigInt(idx);
+            }
+            let hex = n.toString(16);
+            if (hex.length % 2) hex = '0' + hex;
+            let out = []; for (let i = 0; i < hex.length; i += 2)out.push(parseInt(hex.slice(i, i + 2), 16));
+            return fromUtf8Bytes(out);
+        }
+        // base64
+        function encodeBase64(text) {
+            return btoa(unescape(encodeURIComponent(text)));
+        }
+        function decodeBase64(text) {
+            try {
+                return decodeURIComponent(escape(atob(text)));
+            } catch (e) {
+                throw '输入不是合法base64编码';
+            }
+        }
+        // base85 (ascii85 RFC1924, 仅最简单实现)
+        function encodeBase85(text) {
+            const alphabet = '!#$%&()*+-;<=>?@^_`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+            let bytes = toUtf8Bytes(text), n = BigInt('0x' + Array.from(bytes).map(x => x.toString(16).padStart(2, '0')).join('')), out = '';
+            while (n > 0) {
+                out = alphabet[n % 85n] + out; n /= 85n;
+            }
+            return out;
+        }
+        function decodeBase85(str) {
+            const alphabet = '!#$%&()*+-;<=>?@^_`{|}~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+            let n = 0n;
+            for (let c of str) {
+                let idx = alphabet.indexOf(c);
+                if (idx < 0) throw "输入不是合法base85编码";
+                n = n * 85n + BigInt(idx);
+            }
+            let hex = n.toString(16);
+            if (hex.length % 2) hex = '0' + hex;
+            let out = []; for (let i = 0; i < hex.length; i += 2)out.push(parseInt(hex.slice(i, i + 2), 16));
+            return fromUtf8Bytes(out);
+        }
+        const ENCODERS = {
+            base16: [encodeBase16, decodeBase16],
+            base32: [encodeBase32, decodeBase32],
+            base36: [encodeBase36, decodeBase36],
+            base58: [encodeBase58, decodeBase58],
+            base62: [encodeBase62, decodeBase62],
+            base64: [encodeBase64, decodeBase64],
+            base85: [encodeBase85, decodeBase85],
+        };
+
+        // 生成base类型按钮
+        const baseSel = document.getElementById('base-types');
+        let activeType = 'base64';
+        baseTypes.forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = 'base-button'; btn.innerHTML = `${item.icon} ${item.name}`;
+            btn.title = item.desc;
+            btn.dataset.type = item.value;
+            if (item.value === activeType) btn.classList.add('active');
+            btn.onclick = () => {
+                for (let el of baseSel.querySelectorAll('.base-button')) el.classList.remove('active');
+                btn.classList.add('active');
+                activeType = item.value;
+                showTips(`切换到 <b>${item.name}</b>，${item.desc}。`);
+            };
+            baseSel.appendChild(btn);
+        });
+
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const encodeBtn = document.getElementById('encodeBtn');
+        const decodeBtn = document.getElementById('decodeBtn');
+        const actionMsg = document.getElementById('actionMsg');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // 动画+高亮tips
+        function showTips(msg) {
+            actionMsg.innerHTML = msg;
+            actionMsg.animate([{ opacity: 0.4 }, { opacity: 1 }], { duration: 340 });
+        }
+        function showOutput(text) {
+            outputText.textContent = text;
+            outputText.animate([{ background: '#ffe6db' }, { background: '#fffbea' }], { duration: 220 });
+        }
+        function handleCopy() {
+            navigator.clipboard.writeText(outputText.textContent);
+            copyBtn.innerText = '已复制!';
+            setTimeout(() => copyBtn.innerText = '复制', 1200);
+        }
+
+        // 更友好的错误展示
+        function showError(e, isDecode = false) {
+            let msg = String(e);
+            if (msg.includes("atob") || msg.includes("InvalidCharacterError"))
+                msg = "解码失败，可能输入不是合法的编码文本。";
+            else if (/非法|invalid|illegal/i.test(msg))
+                msg = "输入内容不是当前 Base 类型的合法编码，请检查。";
+            else if (/BigInt/.test(msg))
+                msg = "输入内容过长，暂不支持极大文本的转换。";
+            else if (isDecode)
+                msg = "解码失败，请确认输入内容是合法的编码。";
+            else
+                msg = "操作出错，请检查输入或稍后再试。";
+            showTips(msg);
+        }
+
+        // 事件
+        encodeBtn.onclick = () => {
+            try {
+                const fn = ENCODERS[activeType][0];
+                showOutput(fn(inputText.value));
+                showTips('编码成功 ✨');
+            } catch (e) {
+                showError(e);
+            }
+        };
+        decodeBtn.onclick = () => {
+            try {
+                const fn = ENCODERS[activeType][1];
+                let result = fn(inputText.value);
+                showOutput(result);
+                showTips('解码成功 🎉');
+            } catch (e) {
+                showError(e, true);
+            }
+        };
+        copyBtn.onclick = handleCopy;
+
+        inputText.onfocus = () => inputText.style.background = '#fffcea';
+        inputText.onblur = () => inputText.style.background = 'rgba(255,255,255,0.52)';
+        inputText.oninput = () => {
+            showTips('输入已修改，点击下方按钮进行操作。');
+            outputText.textContent = '';
+        };
+
+        showTips('选择Base类型并输入内容，然后点击“编码”或“解码”吧！');
+    </script>
+</body>
+
+</html>
