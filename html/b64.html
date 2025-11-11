@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Base64 编解码 | 极致体验</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @font-face {
+            font-family: 'MyFont';
+            /* 自定义一个字体名称（随意起名） */
+            src: url('../font.ttf') format('truetype');
+            /* 根据实际路径调整 */
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --primary: #1e293b;
+            --accent: #10b981;
+            --background: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --shadow: 0 6px 32px 0 rgba(0, 0, 0, 0.08);
+            --transition: 0.4s cubic-bezier(.41, .95, .54, 1.12);
+            --danger: #ec3d50;
+            --danger-bg: #ffebebc4;
+        }
+
+        body {
+            background: radial-gradient(ellipse at 60% 20%, #e0eeff 0%, #f8fafc 100%);
+            margin: 0;
+            min-height: 100vh;
+            font-family: Myfont, '华文仿宋', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            display: flex;
+            width: 900px;
+            max-width: 98vw;
+            min-height: 400px;
+            background: linear-gradient(120deg, #e0eeff88 0%, #fff 100%);
+            border-radius: 32px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: box-shadow var(--transition);
+            margin-top: 4vw;
+        }
+
+        .container:hover {
+            box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.17);
+        }
+
+        .panel {
+            flex: 1 1 0;
+            display: flex;
+            flex-direction: column;
+            padding: 44px 34px 36px;
+            background: var(--card-bg);
+            transition: background var(--transition);
+            position: relative;
+        }
+
+        .panel:not(:last-child) {
+            border-right: 1.5px solid #eee;
+        }
+
+        .panel h2 {
+            margin: 0 0 12px 0;
+            letter-spacing: 2px;
+            font-size: 1.16rem;
+            color: #56a39d;
+            font-weight: 700;
+        }
+
+        .clear-btn {
+            position: absolute;
+            top: 16px;
+            right: 22px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25em;
+            color: #aaa;
+            outline: none;
+            padding: 2px 4px;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: color 0.22s, background 0.2s;
+            z-index: 3;
+        }
+
+        .clear-btn:hover,
+        .clear-btn:focus {
+            color: var(--danger);
+            background: #f7d5d5;
+        }
+
+        textarea {
+            resize: none;
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 160px;
+            flex: 1 1 0;
+            border: none;
+            background: #eef3f799;
+            border-radius: 14px;
+            font-size: 1rem;
+            padding: 18px 16px;
+            line-height: 1.56;
+            color: var(--primary);
+            box-shadow: 0 2px 16px 0 rgba(11, 44, 55, 0.03) inset;
+            transition: box-shadow var(--transition), background var(--transition);
+            outline: none;
+            margin-bottom: 2rem;
+            margin-top: 8px;
+        }
+
+        textarea:focus {
+            box-shadow: 0 4px 32px 0 #4bf6be30, 0 2px 16px 0 rgba(18, 90, 110, 0.04) inset;
+            background: #fff;
+        }
+
+        .cleared-anim {
+            animation: cleared 0.44s cubic-bezier(.22, .94, .64, 1.22);
+        }
+
+        @keyframes cleared {
+            0% {
+                background: var(--danger-bg);
+            }
+
+            55% {
+                background: var(--danger-bg);
+            }
+
+            100% {
+                background: #eef3f799;
+            }
+        }
+
+        .actions {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 9px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px 0 #10b98122;
+            outline: none;
+            transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover,
+        .btn:focus {
+            background: #029c67;
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 4px 18px 0 #10b98133;
+        }
+
+        .divider {
+            width: 2px;
+            background: linear-gradient(#6ee7b7 60%, #bef264d0 100%);
+            height: 80%;
+            align-self: center;
+            border-radius: 16px;
+            opacity: 0.13;
+            margin: 8vh 0 0;
+        }
+
+        .tip {
+            font-size: .91em;
+            color: #999;
+            margin-top: 12px;
+            text-align: left;
+        }
+
+        @media (max-width: 850px) {
+            .container {
+                flex-direction: column;
+                width: 97vw;
+            }
+
+            .divider {
+                width: 80%;
+                height: 2px;
+                margin: 0 0 0 10vw;
+                align-self: flex-start;
+            }
+
+            .panel {
+                padding: 24px 6vw 20px;
+                min-height: 190px;
+            }
+        }
+
+        @media (max-width: 530px) {
+            .container {
+                border-radius: 16px;
+                margin-top: 6vw;
+                min-height: 0;
+            }
+
+            .panel {
+                padding: 16px 4vw;
+            }
+
+            textarea {
+                padding: 10px 8px;
+            }
+        }
+
+        .btn::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.48);
+            left: 50%;
+            top: 50%;
+            transform: scale(1) translate(-50%, -50%);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.6s cubic-bezier(.2, .6, .4, 1);
+        }
+
+        .btn:active::after {
+            width: 160px;
+            height: 160px;
+            opacity: .2;
+            background: rgba(255, 255, 255, 0.65);
+        }
+
+        textarea:focus {
+            outline: 2px solid #6ee7b7dd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 原始文本/文件 区域 -->
+        <section class="panel" id="panel-plain">
+            <h2>原始内容（自动 <span style="font-size:0.93em;color:#21976e;">Base64</span> 编码）</h2>
+            <button class="clear-btn" id="clearPlain" aria-label="清空原文" title="清空原文">✕</button>
+            <textarea id="plain" placeholder="输入任何文本或粘贴文件内容..." aria-label="原文"></textarea>
+            <div class="actions">
+                <button class="btn" id="encodeBtn">编码 ▶️</button>
+                <input type="file" id="fileInput" style="display:none;" />
+                <button class="btn" id="fileBtn" title="选择文件">📄 添加文件</button>
+            </div>
+        </section>
+        <aside class="divider"></aside>
+        <!-- Base64 区域 -->
+        <section class="panel" id="panel-base64">
+            <h2>Base64 内容（自动解码）</h2>
+            <button class="clear-btn" id="clearBase64" aria-label="清空Base64区" title="清空Base64区">✕</button>
+            <textarea id="base64" placeholder="在此粘贴 base64，将自动解码..." aria-label="Base64"></textarea>
+            <div class="actions">
+                <button class="btn" id="decodeBtn">◀️ 解码</button>
+                <button class="btn" id="copyBtn" title="复制Base64">📋 复制</button>
+            </div>
+        </section>
+    </div>
+    <script>
+        // 编解码核心实现
+        function encodeBase64(str) {
+            return btoa(unescape(encodeURIComponent(str)));
+        }
+        function decodeBase64(str) {
+            try {
+                return decodeURIComponent(escape(atob(str)));
+            } catch (e) {
+                return null;
+            }
+        }
+        const plain = document.getElementById('plain');
+        const base64 = document.getElementById('base64');
+        const fileBtn = document.getElementById('fileBtn');
+        const fileInput = document.getElementById('fileInput');
+        const encodeBtn = document.getElementById('encodeBtn');
+        const decodeBtn = document.getElementById('decodeBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const clearPlain = document.getElementById('clearPlain');
+        const clearBase64 = document.getElementById('clearBase64');
+        let isSyncing = false;
+        function encodeSync() {
+            if (isSyncing) return;
+            isSyncing = true;
+            const text = plain.value;
+            if (text.trim() === '') {
+                base64.value = '';
+                isSyncing = false;
+                return;
+            }
+            base64.value = encodeBase64(text);
+            base64.style.background = '#eef3f799';
+            isSyncing = false;
+        }
+        function decodeSync(setCaretToEnd = true) {
+            if (isSyncing) return;
+            isSyncing = true;
+            const b64 = base64.value.trim();
+            if (b64 === '') {
+                plain.value = '';
+                plain.style.background = '#eef3f799';
+                isSyncing = false;
+                return;
+            }
+            const decoded = decodeBase64(b64);
+            if (decoded === null) {
+                plain.value = '';
+                plain.style.background = '#ffebebad';
+                base64.style.background = '#ffebebad';
+            } else {
+                plain.value = decoded;
+                plain.style.background = '#eef3f799';
+                base64.style.background = '#eef3f799';
+                if (setCaretToEnd) {
+                    plain.scrollTop = plain.scrollHeight;
+                }
+            }
+            isSyncing = false;
+        }
+        plain.addEventListener('input', encodeSync);
+        base64.addEventListener('input', () => decodeSync(false));
+        encodeBtn && encodeBtn.addEventListener('click', () => {
+            encodeSync();
+            base64.focus();
+            base64.select();
+        });
+        decodeBtn && decodeBtn.addEventListener('click', () => {
+            decodeSync();
+            plain.focus();
+            plain.select();
+        });
+        copyBtn && copyBtn.addEventListener('click', () => {
+            base64.select();
+            document.execCommand('copy');
+            copyBtn.textContent = '✅ 已复制!';
+            setTimeout(() => { copyBtn.textContent = '📋 复制'; }, 950);
+        });
+        fileBtn && fileBtn.addEventListener('click', () => fileInput.click());
+        fileInput && fileInput.addEventListener('change', (e) => {
+            const file = fileInput.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                plain.value = ev.target.result;
+                encodeSync();
+            }
+            reader.readAsText(file, 'utf-8');
+        });
+        plain.addEventListener('paste', function (e) {
+            const items = (e.clipboardData || window.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].kind === 'file') {
+                    e.preventDefault();
+                    const file = items[i].getAsFile();
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (evt) {
+                            plain.value = evt.target.result;
+                            encodeSync();
+                        }
+                        reader.readAsText(file, 'utf-8');
+                    }
+                }
+            }
+        });
+        // 一键清空并动画
+        function clearTextarea(ele) {
+            ele.value = '';
+            ele.classList.remove('cleared-anim'); // 触发重置
+            void ele.offsetWidth;
+            ele.classList.add('cleared-anim');
+            encodeSync(); // 防止双向不同步
+            decodeSync(false);
+        }
+        clearPlain && clearPlain.addEventListener('click', () => {
+            clearTextarea(plain);
+            setTimeout(() => {
+                plain.focus();
+            }, 180);
+        });
+        clearBase64 && clearBase64.addEventListener('click', () => {
+            clearTextarea(base64);
+            setTimeout(() => {
+                base64.focus();
+            }, 180);
+        });
+        window.onload = () => {
+            plain.value = '';
+            base64.value = '';
+            plain.placeholder = '输入一些文本，比如：你好，世界!';
+            base64.placeholder = '或者粘贴一段 Base64：5L2g5aW977yM5LiW55WM77yB';
+        };
+    </script>
+</body>
+
+</html>
