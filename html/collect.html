@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>我的链接页</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --max-width: 900px;
+
+            /* 背景 */
+            --bg-1: #f6f8fb;
+            --bg-2: #eef4fb;
+
+            /* 文本与辅助 */
+            --text: #0f1724;
+            /* 主文本 */
+            --muted: #57606a;
+            /* 次要文本 */
+            --muted-2: rgba(87, 96, 106, 0.7);
+
+            /* 主题点缀 */
+            --accent: #6f5cff;
+            /* 主色（沉稳紫）*/
+            --accent-2: #22c6c3;
+            /* 副色（青绿色）*/
+
+            /* UI */
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --glass: rgba(255, 255, 255, 0.6);
+            --border: rgba(15, 20, 28, 0.06);
+            --shadow-lg: 0 14px 40px rgba(15, 20, 28, 0.06);
+            --shadow-sm: 0 6px 18px rgba(12, 16, 22, 0.04);
+            --radius: 14px;
+        }
+
+        /* 暗色主题 */
+        body.dark {
+            --bg-1: #071022;
+            --bg-2: #071522;
+            --text: #e6eef8;
+            --muted: #9fb4c6;
+            --muted-2: rgba(159, 180, 198, 0.72);
+            --accent: #9a92ff;
+            --accent-2: #3ee3df;
+            --card-bg: rgba(12, 16, 22, 0.52);
+            --glass: rgba(12, 16, 22, 0.46);
+            --border: rgba(255, 255, 255, 0.04);
+            --shadow-lg: 0 18px 44px rgba(2, 6, 12, 0.6);
+            --shadow-sm: none;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background:
+                radial-gradient(800px 260px at 8% 12%, rgba(111, 92, 255, 0.06), transparent),
+                radial-gradient(600px 200px at 92% 88%, rgba(34, 198, 195, 0.04), transparent),
+                linear-gradient(180deg, var(--bg-1), var(--bg-2));
+            color: var(--text);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 48px 20px;
+            transition: background .3s ease, color .25s ease;
+        }
+
+        .wrap {
+            width: min(var(--max-width), 100%);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.55));
+            border-radius: calc(var(--radius) + 6px);
+            padding: 22px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(8px) saturate(120%);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: background .25s ease, border .25s ease, box-shadow .25s ease;
+        }
+
+        body.dark .wrap {
+            background: linear-gradient(180deg, rgba(12, 16, 22, 0.52), rgba(8, 12, 18, 0.46));
+        }
+
+        header {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .brand {
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 8px 20px rgba(111, 92, 255, 0.12);
+            flex: 0 0 56px;
+            font-size: 18px;
+        }
+
+        .title h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600
+        }
+
+        .title p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center
+        }
+
+        .search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            min-width: 240px;
+            color: var(--muted);
+            transition: box-shadow .18s, transform .18s, color .18s, background .18s;
+        }
+
+        .search:focus-within {
+            box-shadow: 0 8px 26px rgba(99, 84, 255, 0.06);
+            color: var(--text)
+        }
+
+        .search svg {
+            flex: 0 0 16px;
+            stroke: currentColor
+        }
+
+        .search input {
+            border: 0;
+            background: transparent;
+            outline: none;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            color: white;
+            font-weight: 600;
+            border: 0;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(111, 92, 255, 0.12);
+            transition: transform .14s ease, box-shadow .14s, opacity .12s;
+        }
+
+        .btn.ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            box-shadow: none;
+            font-weight: 600;
+        }
+
+        .btn.small {
+            padding: 6px 10px;
+            font-size: 13px;
+            border-radius: 9px
+        }
+
+        .btn:active {
+            transform: translateY(1px)
+        }
+
+        main {
+            display: block
+        }
+
+        /* Grid of links (no icons) */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .card {
+            display: flex;
+            align-items: flex-start;
+            padding: 14px;
+            border-radius: 12px;
+            background: var(--card-bg);
+            box-shadow: var(--shadow-sm);
+            transition: transform .16s cubic-bezier(.2, .9, .3, 1), box-shadow .16s, background .16s;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid var(--border);
+        }
+
+        .card:hover {
+            /* transform: translateY(-6px); */
+            box-shadow: 0 20px 44px rgba(12, 16, 22, 0.08);
+        }
+
+        .meta {
+            flex: 1;
+            min-width: 0
+        }
+
+        .meta .name {
+            font-weight: 650;
+            font-size: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .meta .desc {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .hint {
+            font-size: 13px;
+            color: var(--muted);
+            text-align: center;
+            padding: 18px 8px
+        }
+
+        footer {
+            margin-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        @media (max-width:520px) {
+            .search {
+                min-width: 140px
+            }
+
+            .brand .logo {
+                width: 48px;
+                height: 48px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap" role="application" aria-label="我的链接页">
+        <header>
+            <div class="brand">
+                <div class="logo" aria-hidden="true">初雪</div>
+                <div class="title">
+                    <h1>常用链接集合</h1>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="search" title="搜索链接" aria-hidden="false">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"
+                        role="img">
+                        <path d="M21 21l-4.35-4.35" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="11" cy="11" r="6.2" stroke-width="1.6" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <input id="search" placeholder="搜索（名称 / URL）" aria-label="搜索链接" />
+                </div>
+
+                <button class="btn ghost small" id="themeToggle" title="切换明暗主题">切换主题</button>
+            </div>
+        </header>
+
+        <main>
+            <div id="grid" class="grid" aria-live="polite"></div>
+
+            <div id="empty" class="hint" style="display:none;margin-top:12px">
+                这里没有匹配的链接
+            </div>
+        </main>
+
+        <footer>
+            <div style="display:flex;gap:8px;align-items:center">
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        (function () {
+            // 写死的链接：在此数组里编辑即可
+            const links = [
+                { title: 'GitHub', url: 'https://github.com/' },
+                { title: 'e-POC', url: 'https://github.com/eeeeeeeeee-code/POC.git' },
+                { title: 'Awesome-POC', url: 'https://github.com/Threekiii/Awesome-POC.git' },
+                { title: 'edusrc', url: 'https://src.sjtu.edu.cn/' },
+                { title: 'fofa', url: 'https://fofa.info/' },
+                { title: '奇安信 Hunter', url: 'https://hunter.qianxin.com/' },
+                { title: '博客园', url: 'https://www.cnblogs.com/' },
+                { title: '工信部备案查询', url: 'https://beian.miit.gov.cn/' }
+            ];
+
+            const grid = document.getElementById('grid');
+            const empty = document.getElementById('empty');
+            const searchInput = document.getElementById('search');
+
+            function render(filter = '') {
+                grid.innerHTML = '';
+                const q = (filter || '').trim().toLowerCase();
+                const filtered = links.filter(it => {
+                    if (!q) return true;
+                    return it.title.toLowerCase().includes(q) || it.url.toLowerCase().includes(q);
+                });
+
+                if (filtered.length === 0) {
+                    empty.style.display = 'block';
+                } else {
+                    empty.style.display = 'none';
+                }
+
+                for (const it of filtered) {
+                    const a = document.createElement('a');
+                    a.className = 'card';
+                    a.href = it.url;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.setAttribute('title', it.title + ' — ' + it.url);
+
+                    const meta = document.createElement('div');
+                    meta.className = 'meta';
+
+                    const name = document.createElement('div');
+                    name.className = 'name';
+                    name.textContent = it.title;
+
+                    const desc = document.createElement('div');
+                    desc.className = 'desc';
+                    desc.textContent = it.url;
+
+                    meta.appendChild(name);
+                    meta.appendChild(desc);
+                    a.appendChild(meta);
+
+                    grid.appendChild(a);
+                }
+            }
+
+            searchInput.addEventListener('input', (e) => render(e.target.value));
+            render();
+
+            // theme toggle (persistent)
+            (function () {
+                const themeKey = 'myLinks_theme';
+                const stored = localStorage.getItem(themeKey);
+                if (stored === 'dark') document.body.classList.add('dark');
+
+                const btn = document.getElementById('themeToggle');
+                btn.addEventListener('click', () => {
+                    document.body.classList.toggle('dark');
+                    localStorage.setItem(themeKey, document.body.classList.contains('dark') ? 'dark' : 'light');
+                });
+            })();
+
+            // accessibility: Enter on search focuses first result
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const first = grid.querySelector('a.card');
+                    if (first) first.focus();
+                }
+            });
+
+            // Expose for quick editing from console
+            window.__MY_LINKS = { links, render };
+        })();
+    </script>
+</body>
+
+</html>
