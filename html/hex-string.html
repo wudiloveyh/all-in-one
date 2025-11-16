@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>简洁 Hex ↔ Text 转换器</title>
+    <style>
+        :root {
+            --bg: #f3f6fb;
+            --card: #ffffff;
+            --text: #0b1220;
+            --muted: #6b7280;
+            --accent: #4f46e5;
+            --accent2: #06b6d4;
+            --radius: 12px;
+            --shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+            --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        /* Card (centered, limited width) */
+        .card {
+            width: 100%;
+            max-width: 920px;
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        header.header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .brand {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 16px
+        }
+
+        .sub {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .tools {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 0;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.12);
+        }
+
+        .btn.ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid rgba(11, 17, 32, 0.06);
+            box-shadow: none;
+        }
+
+        .small {
+            padding: 6px 10px;
+            font-size: 13px;
+            border-radius: 8px
+        }
+
+        /* Panels */
+        .body {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .pane {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label.h {
+            font-size: 13px;
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        textarea {
+            min-height: 160px;
+            border-radius: 8px;
+            border: 1px solid rgba(11, 17, 32, 0.04);
+            padding: 12px;
+            resize: vertical;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text);
+            background: transparent;
+        }
+
+        /* center action column */
+        .center {
+            width: 112px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .primary {
+            width: 100%;
+            display: block;
+            text-align: center
+        }
+
+        .swap {
+            background: transparent;
+            border: 1px solid rgba(11, 17, 32, 0.06);
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer
+        }
+
+        /* footer options */
+        .options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        select,
+        input[type=checkbox] {
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid rgba(11, 17, 32, 0.06)
+        }
+
+        footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--muted);
+            font-size: 13px;
+            padding-top: 6px
+        }
+
+        /* responsive: stack on small screens */
+        @media (max-width:820px) {
+            .body {
+                flex-direction: column
+            }
+
+            .center {
+                flex-direction: row;
+                width: 100%;
+                justify-content: space-between
+            }
+
+            .primary {
+                width: auto;
+                padding: 8px 10px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card" role="main" aria-label="Hex Text Converter">
+        <header class="header">
+            <div class="brand">
+                <div class="logo">Hx</div>
+                <div>
+                    <h1>简洁 Hex ↔ Text</h1>
+                    <p class="sub">UTF‑8 支持 · 自动检测 · 复制/导出</p>
+                </div>
+            </div>
+            <div class="tools" aria-hidden="false">
+                <button id="themeToggleBtn" class="btn ghost small" title="切换主题 (T)">切换主题</button>
+                <button id="helpBtn" class="btn ghost small" title="帮助 (H)">帮助</button>
+            </div>
+        </header>
+
+        <div class="body">
+            <section class="pane">
+                <label class="h">输入 <span id="inputCount">0 字符</span></label>
+                <textarea id="input" placeholder="输入文本或 Hex（支持空格/冒号/破折号分隔）"></textarea>
+                <div class="options" style="justify-content:space-between">
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <label><input id="autoDetect" type="checkbox" checked> 自动检测</label>
+                        <label><input id="upper" type="checkbox"> 大写 Hex</label>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <button id="pasteBtn" class="small">粘贴</button>
+                        <button id="clearBtn" class="small">清空</button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="center" aria-hidden="false">
+                <button id="toHex" class="btn primary">转 → Hex</button>
+                <button id="toText" class="btn primary">Hex → 转</button>
+                <button id="swap" class="swap" title="交换">⇄</button>
+            </div>
+
+            <section class="pane">
+                <label class="h">输出 <span id="outputCount">0 字节</span></label>
+                <textarea id="output" readonly placeholder="结果将显示在这里"></textarea>
+                <div class="options" style="justify-content:space-between">
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <label>分隔符
+                            <select id="sep">
+                                <option value="none">无</option>
+                                <option value="space">空格</option>
+                                <option value="colon">冒号</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <button id="copyBtn" class="small">复制</button>
+                        <button id="downloadBtn" class="small">导出</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <div id="helpText" style="display:none;max-width:700px">
+                快捷：T 切换主题 · H 显示/隐藏帮助 · Ctrl/Cmd+Enter 快速转换。Hex 使用 UTF‑8 解码。
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        (function () {
+            // Elements
+            const input = document.getElementById('input');
+            const output = document.getElementById('output');
+            const toHex = document.getElementById('toHex');
+            const toText = document.getElementById('toText');
+            const swap = document.getElementById('swap');
+            const pasteBtn = document.getElementById('pasteBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const autoDetect = document.getElementById('autoDetect');
+            const upper = document.getElementById('upper');
+            const sep = document.getElementById('sep');
+            const inputCount = document.getElementById('inputCount');
+            const outputCount = document.getElementById('outputCount');
+            const helpBtn = document.getElementById('helpBtn');
+            const helpText = document.getElementById('helpText');
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            let dark = false;
+
+            // Helpers
+            function updateInputCount() { inputCount.textContent = input.value.length + ' 字符'; }
+            function updateOutputCount(n) { outputCount.textContent = (n || 0) + ' 字节'; }
+
+            function stringToHex(str) {
+                const encoder = new TextEncoder();
+                const bytes = encoder.encode(str);
+                return Array.from(bytes).map(b => b.toString(16).padStart(2, '0'));
+            }
+            function sanitizeHex(s) { return s.replace(/[^0-9a-fA-F]/g, ''); }
+            function hexToBytes(hex) {
+                const s = sanitizeHex(hex);
+                if (s.length % 2 === 1) throw new Error('Hex 长度为奇数');
+                const arr = new Uint8Array(s.length / 2);
+                for (let i = 0; i < s.length; i += 2) arr[i / 2] = parseInt(s.substr(i, 2), 16);
+                return arr;
+            }
+            function bytesToString(u8) {
+                return new TextDecoder().decode(u8);
+            }
+            function formatHex(arr) {
+                const sepChar = sep.value === 'space' ? ' ' : (sep.value === 'colon' ? ':' : '');
+                const mapped = arr.map(h => upper.checked ? h.toUpperCase() : h.toLowerCase());
+                return mapped.join(sepChar);
+            }
+
+            function isLikelyHex(s) {
+                const t = s.trim();
+                if (!t) return false;
+                const cleaned = t.replace(/[\s:\-]/g, '');
+                return /^[0-9a-fA-F]+$/.test(cleaned) && cleaned.length >= 2;
+            }
+
+            // Actions
+            function convertToHex() {
+                if (!input.value.trim()) { flash('请输入文本'); return; }
+                const arr = stringToHex(input.value);
+                output.value = formatHex(arr);
+                updateOutputCount(arr.length);
+                flash('已转换为 Hex');
+            }
+            function convertToText() {
+                if (!input.value.trim()) { flash('请输入 Hex'); return; }
+                let s = input.value.replace(/[\s:\-]/g, '');
+                if (s.length % 2 === 1) s = '0' + s; // pad
+                try {
+                    const bytes = hexToBytes(s);
+                    output.value = bytesToString(bytes);
+                    updateOutputCount(bytes.length);
+                    flash('已转换为文本');
+                } catch (e) {
+                    flash('转换失败：' + e.message, true);
+                }
+            }
+
+            // small toast
+            function flash(msg, err) {
+                const div = document.createElement('div');
+                div.textContent = msg;
+                div.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:30px;padding:8px 12px;border-radius:8px;color:#fff;font-weight:600;z-index:9999';
+                div.style.background = err ? 'rgba(239,68,68,0.95)' : 'rgba(16,185,129,0.95)';
+                document.body.appendChild(div);
+                setTimeout(() => div.style.opacity = '0', 1100);
+                setTimeout(() => div.remove(), 1500);
+            }
+
+            // Events
+            toHex.addEventListener('click', convertToHex);
+            toText.addEventListener('click', convertToText);
+            swap.addEventListener('click', () => {
+                const a = input.value; input.value = output.value || ''; output.value = a || '';
+                updateInputCount();
+                updateOutputCount(output.value ? (isLikelyHex(output.value) ? sanitizeHex(output.value).length / 2 : 0) : 0);
+                flash('已交换');
+            });
+
+            input.addEventListener('input', () => {
+                updateInputCount();
+                if (autoDetect.checked) {
+                    if (isLikelyHex(input.value)) {
+                        try {
+                            const cleaned = input.value.replace(/[\s:\-]/g, '');
+                            const arr = hexToBytes(cleaned.length % 2 === 1 ? ('0' + cleaned) : cleaned);
+                            output.value = bytesToString(arr);
+                            updateOutputCount(arr.length);
+                        } catch { updateOutputCount(0); }
+                    } else {
+                        const a = stringToHex(input.value);
+                        output.value = formatHex(a);
+                        updateOutputCount(a.length);
+                    }
+                }
+            });
+
+            pasteBtn.addEventListener('click', async () => {
+                try {
+                    const t = await navigator.clipboard.readText();
+                    input.value = (input.value ? input.value + '\n' : '') + t;
+                    input.dispatchEvent(new Event('input'));
+                    flash('粘贴完成');
+                } catch { flash('粘贴失败', true); }
+            });
+
+            clearBtn.addEventListener('click', () => { input.value = ''; output.value = ''; updateInputCount(); updateOutputCount(0); });
+
+            copyBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(output.value);
+                    flash('已复制输出');
+                } catch { flash('复制失败', true); }
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                const content = output.value;
+                if (!content) { flash('无内容可导出', true); return; }
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'result.txt';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(a.href);
+                flash('已导出');
+            });
+
+            helpBtn.addEventListener('click', () => {
+                helpText.style.display = helpText.style.display === 'none' ? 'block' : 'none';
+            });
+
+            themeToggleBtn.addEventListener('click', () => {
+                dark = !dark;
+                if (dark) {
+                    document.documentElement.style.setProperty('--bg', '#0b1220');
+                    document.documentElement.style.setProperty('--card', '#071124');
+                    document.documentElement.style.setProperty('--text', '#e6eef7');
+                    document.body.style.background = 'linear-gradient(180deg,#071124,#071a2a)';
+                } else {
+                    document.documentElement.style.removeProperty('--bg');
+                    document.documentElement.style.removeProperty('--card');
+                    document.documentElement.style.removeProperty('--text');
+                    document.body.style.background = '';
+                }
+            });
+
+            // keyboard
+            document.addEventListener('keydown', (e) => {
+                if (e.key.toLowerCase() === 't') { themeToggleBtn.click(); }
+                if (e.key.toLowerCase() === 'h') { helpBtn.click(); }
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    if (isLikelyHex(input.value)) convertToText(); else convertToHex();
+                }
+            });
+
+            // init
+            updateInputCount(); updateOutputCount(0);
+
+        })();
+    </script>
+</body>
+
+</html>
