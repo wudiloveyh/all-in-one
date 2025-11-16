@@ -2,536 +2,474 @@
 <html lang="zh-CN">
 
 <head>
-    <meta charset="UTF-8">
-    <title>URL 编解码工具 | 极致体验创新版</title>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <title>URL 编解码（支持全字节编码 & 自动识别解码）</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <style>
         :root {
-            --main: #1a3b5d;
-            --fade: #b6dcfa;
-            --accent: #fb8c00;
-            --bg: #f3f7fa;
-            --card: white;
-            --shadow: 0 12px 40px 0 #57a7ff0f;
-            --btn: #fb8c00;
-            --btn-hover: #be670a;
+            --bg: #f6fbff;
+            --card: #ffffff;
+            --accent: #0f62fe;
+            --accent-2: #ff7a00;
+            --muted: #98a6b3;
+            --success: #15b37a;
+            --danger: #ff4567;
+            --radius: 18px;
+            --shadow: 0 12px 40px rgba(12, 40, 80, 0.06);
+            --glass: rgba(255, 255, 255, 0.85);
+            --transition: 320ms cubic-bezier(.2, .9, .28, 1);
         }
 
-        @font-face {
-            font-family: 'MyFont';
-            /* 自定义一个字体名称（随意起名） */
-            src: url('../font.ttf') format('truetype');
-            /* 根据实际路径调整 */
-            font-weight: normal;
-            font-style: normal;
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
         }
 
         body {
-            background: linear-gradient(120deg, #e3f0ff 0%, #fbffe5 100%);
-            min-height: 100vh;
             margin: 0;
-            font-family: 'MyFont';
-            color: var(--main);
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(180deg, #eef8ff 0%, #fbfff7 100%);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
+            padding: 28px;
+            color: #213244;
         }
 
-        .url-card {
-            margin-top: 6vw;
-            min-width: 340px;
-            width: 680px;
+        .app {
+            width: 920px;
             max-width: 98vw;
-            border-radius: 34px;
+            border-radius: calc(var(--radius) + 6px);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.98));
             box-shadow: var(--shadow);
-            background: var(--card);
-            display: flex;
-            flex-direction: row;
             overflow: hidden;
-            transition: box-shadow .48s cubic-bezier(.3, .8, .43, 1.07), background 0.4s;
-            position: relative;
+            transition: box-shadow var(--transition);
+            display: grid;
+            grid-template-columns: 1fr 12px 1fr;
+            align-items: stretch;
         }
 
-        .card-col {
-            flex: 1 1 0;
-            min-height: 360px;
-            display: flex;
-            flex-direction: column;
-            padding: 48px 30px 38px;
-            background: rgba(255, 255, 255, 0.94);
-            transition: background 0.36s;
-            position: relative;
-        }
-
-        .card-col:not(:last-child) {
-            border-right: 1.5px solid #e2e8ef;
-        }
-
-        .card-col h2 {
-            margin: 0 0 10px 0;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            color: #e7a227;
-            font-size: 1.13rem;
+        .header {
+            grid-column: 1 / -1;
             display: flex;
             align-items: center;
-            min-height: 28px;
+            justify-content: space-between;
+            padding: 18px 26px;
+            border-bottom: 1px solid #f0f4f8;
+            background: linear-gradient(90deg, rgba(15, 98, 254, 0.03), rgba(255, 122, 0, 0.02));
         }
 
-        .card-col .col-row {
-            margin: 0 0 10px 0;
+        .title {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: .93em;
-            color: #888;
-            user-select: none;
+            gap: 14px;
         }
 
-        .action-bar {
-            margin-top: 18px;
+        .logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
             display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .btn {
-            display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: var(--btn);
-            color: #fff;
-            font-weight: 600;
-            font-size: 1rem;
-            padding: 8px 22px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 6px 22px rgba(15, 98, 254, 0.12);
+        }
+
+        .title h1 {
+            margin: 0;
+            font-size: 1.05rem;
+            letter-spacing: 0.2px;
+        }
+
+        .title p {
+            margin: 0;
+            font-size: 0.86rem;
+            color: var(--muted);
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .small {
+            font-size: 0.9rem;
+            color: var(--muted);
+            background: rgba(10, 20, 40, 0.02);
+            padding: 6px 10px;
+            border-radius: 8px;
+        }
+
+        .col {
+            padding: 22px 22px 26px;
+            background: var(--glass);
             position: relative;
-            box-shadow: 0 1px 10px #fb8c003a;
-            overflow: hidden;
-            outline: none;
-            transition: background 0.21s, transform 0.35s cubic-bezier(.35, 1.3, .56, 1), box-shadow 0.27s;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        .btn:hover,
-        .btn:focus {
-            background: var(--btn-hover);
-            transform: scale(1.04) translateY(-2px);
-            box-shadow: 0 4px 20px #fb8c0035;
-        }
-
-        .btn:active {
-            background: #f3b357;
-            color: #704200;
-        }
-
-        .btn.ripple::after {
-            content: "";
-            position: absolute;
-            border-radius: 50%;
-            left: 50%;
-            top: 50%;
+        .divider {
             width: 12px;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.38);
-            opacity: 0;
-            transform: scale(1) translate(-50%, -50%);
-            pointer-events: none;
-            transition: all 0.6s cubic-bezier(.2, .7, .4, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .btn.ripple:active::after {
-            width: 120px;
-            height: 120px;
-            opacity: .26;
-            background: rgba(255, 255, 255, 0.68);
+        .divider .bar {
+            width: 3px;
+            height: 72%;
+            border-radius: 8px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            opacity: 0.08;
         }
 
-        .clear-btn {
-            position: absolute;
-            top: 18px;
-            right: 18px;
-            z-index: 2;
-            background: none;
-            border: none;
-            color: #c6bfbf;
-            font-size: 1.18em;
-            cursor: pointer;
-            padding: 2px 4px;
-            border-radius: 6px;
-            transition: color .19s, background .21s;
+        h2 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--accent-2);
+            font-weight: 600;
         }
 
-        .clear-btn:hover,
-        .clear-btn:focus {
-            background: #ffeceb;
-            color: #fb8c00;
+        .muted {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 6px;
         }
 
         textarea {
-            resize: none;
             width: 100%;
-            box-sizing: border-box;
-            min-height: 120px;
-            flex: 1 1 0;
-            border: none;
-            background: #f8fafd;
+            min-height: 180px;
+            resize: vertical;
+            padding: 14px 14px;
             border-radius: 12px;
-            font-size: 1.04rem;
-            padding: 16px 13px;
-            line-height: 1.55;
-            color: var(--main);
-            box-shadow: 0 2px 14px 0 rgba(11, 60, 100, 0.035) inset;
-            transition: box-shadow 0.37s, background 0.29s;
-            outline: none;
-            margin: 8px 0 20px;
+            border: 1px solid rgba(20, 30, 45, 0.03);
+            background: linear-gradient(180deg, #ffffff, #fbfdff);
+            font-size: 0.98rem;
+            line-height: 1.5;
+            color: #0f2130;
+            box-shadow: inset 0 2px 10px rgba(12, 20, 40, 0.02);
+            transition: box-shadow var(--transition), border-color var(--transition);
         }
 
         textarea:focus {
-            box-shadow: 0 6px 34px 0 #f8a85523, 0 2px 14px 0 rgba(18, 83, 100, 0.04) inset;
-            background: #fff;
-        }
-
-        .copied-bar {
-            font-size: 0.98em;
-            margin-left: 4px;
-            color: #3bc26f;
-            opacity: 0;
-            transition: color 0.3s, opacity 0.6s;
-            pointer-events: none;
-            user-select: none;
-        }
-
-        .copied-bar.active {
-            opacity: 1;
-            font-weight: 800;
-            color: #1dc47f;
-            transition: opacity 0.33s, color .1s;
-        }
-
-        .divider-v {
-            width: 2.1px;
-            background: linear-gradient(105deg, #fb8c00bb 0%, #ffe08288 100%);
-            height: 74%;
-            align-self: center;
-            border-radius: 16px;
-            opacity: 0.12;
-            margin: 0 0 0 0;
-            transition: height 0.3s;
-        }
-
-        /* 动画与布局切换 */
-        .switch-btn {
-            border: none;
             outline: none;
-            background: none;
-            font-size: 1.2em;
-            color: var(--accent);
-            margin: 0 0 0 6px;
+            box-shadow: 0 8px 30px rgba(15, 98, 254, 0.06);
+            border-color: rgba(15, 98, 254, 0.16)
+        }
+
+        .btn {
+            padding: 9px 14px;
+            border-radius: 10px;
+            border: none;
             cursor: pointer;
-            border-radius: 9px;
-            transition: background 0.21s, color 0.18s;
-            padding: 1px 8px 1px 6px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 6px 18px rgba(12, 40, 120, 0.08);
+            transition: transform var(--transition), box-shadow var(--transition);
         }
 
-        .switch-btn:hover,
-        .switch-btn:focus {
-            background: #fff5e1;
-            color: #be670a;
+        .btn.ghost {
+            background: transparent;
+            color: var(--muted);
+            box-shadow: none;
+            border: 1px solid rgba(10, 20, 40, 0.04)
         }
 
-        .fade-swap {
-            animation: fadeSwap 0.38s cubic-bezier(.22, 1.2, .7, 1.05);
+        .row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
 
-        @keyframes fadeSwap {
-            0% {
-                opacity: 0.7;
-                transform: scaleX(0.96) translateY(18px);
-            }
-
-            80% {
-                opacity: 0.97;
-                transform: scale(1.02);
-            }
-
-            100% {
-                opacity: 1;
-                transform: none;
-            }
+        .flex1 {
+            flex: 1
         }
 
-        /* 清空动画 */
-        .cleared-anim {
-            animation: cleared 0.35s cubic-bezier(.22, .94, .64, 1.22);
+        .switch {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: rgba(10, 20, 40, 0.02);
+            color: var(--muted);
+            font-size: 0.92rem;
         }
 
-        @keyframes cleared {
-            0% {
-                background: #ffe2b7;
-            }
-
-            65% {
-                background: #ffe2b7;
-            }
-
-            100% {
-                background: #f8fafd;
-            }
+        .switch input {
+            transform: scale(1.02);
+            margin-right: 6px;
         }
 
-        /* 错误动画 */
-        .error-anim {
-            animation: errorWiggle 0.36s cubic-bezier(.4, 1.23, .77, 1.27);
-            background: #fff8e9 !important;
-            border: 1.5px solid #fe5881 !important;
+        .hint {
+            font-size: 0.9rem;
+            color: var(--muted);
         }
 
-        @keyframes errorWiggle {
-            0% {
-                transform: translateX(0);
-            }
-
-            23% {
-                transform: translateX(-7px);
-            }
-
-            48% {
-                transform: translateX(7px);
-            }
-
-            73% {
-                transform: translateX(-5px);
-            }
-
-            100% {
-                transform: translateX(0);
-            }
+        .copied {
+            color: var(--success);
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 220ms
         }
 
-        .tip {
-            font-size: .94em;
-            color: #bfa454;
-            margin-top: 15px;
-            text-align: left;
-            line-height: 1.45;
-            font-weight: 450;
-            letter-spacing: .2px;
+        .copied.show {
+            opacity: 1
         }
 
-        @media (max-width: 720px) {
-            .url-card {
-                flex-direction: column;
-                width: 99vw;
-                min-width: 120px;
-            }
-
-            .card-col {
-                padding: 24px 4vw 16px;
-            }
-
-            .divider-v {
-                width: 65vw;
-                height: 2.4px;
-                min-height: 12px;
-                margin: 16px 0 0 0;
-            }
+        .error {
+            border: 1px solid var(--danger);
+            background: #fff6f8;
         }
 
-        @media (max-width: 420px) {
-            .url-card {
-                border-radius: 13px;
-                margin-top: 10px;
+        @media (max-width:880px) {
+            .app {
+                grid-template-columns: 1fr;
+                gap: 0
             }
 
-            .card-col {
-                padding: 8vw 2vw 14vw;
+            .divider {
+                display: none
+            }
+
+            .header {
+                padding: 14px
+            }
+
+            .col {
+                padding: 16px
+            }
+
+            textarea {
+                min-height: 140px
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="url-card" id="urlCard">
-        <!-- 编码区/解码区（左，可交换顺序） -->
-        <section class="card-col" id="inputCol">
-            <button class="clear-btn" id="clearInput" aria-label="清空输入" title="清空输入">✕</button>
-            <h2 id="inputLabel">原始内容（自动URL编码）</h2>
-            <div class="col-row">
-                <span id="inputMode">编码</span>
-                <button class="switch-btn" id="swapBtn" title="切换方向">⇄ 切换</button>
+    <div class="app" role="application" aria-label="URL 编解码工具">
+        <div class="header">
+            <div class="title">
+                <div class="logo">URL</div>
+                <div>
+                    <h1>URL 编解码（支持全字节 & 自动识别）</h1>
+                    <p class="muted">自动检测 %XX 并解码；也可强制编码（包括英文字母）为 %HH</p>
+                </div>
             </div>
-            <textarea id="inputArea" placeholder="输入内容，如：https://domain.com/你好.html?xx=张三" aria-label="原文"></textarea>
-            <div class="action-bar">
-                <button class="btn ripple" id="encodeBtn">编码 ▶️</button>
+            <div class="toolbar">
+                <div class="small">实时双向</div>
+                <button class="btn ghost" id="helpBtn" title="使用说明">说明</button>
             </div>
-        </section>
-        <aside class="divider-v"></aside>
-        <!-- 编码结果/解码结果区 -->
-        <section class="card-col" id="outputCol">
-            <button class="clear-btn" id="clearOutput" aria-label="清空输出" title="清空输出">✕</button>
-            <h2 id="outputLabel">编码结果（自动解码）</h2>
-            <div class="col-row">
-                <span id="outputMode">解码</span>
-                <span class="copied-bar" id="copyMark">已复制！</span>
+        </div>
+
+        <div class="col col-left" id="leftCol">
+            <h2 id="inputLabel">原始内容</h2>
+
+            <div class="row controls">
+                <label class="switch"><input type="checkbox" id="fullEncode" checked />全字节编码（A–Z 也编码）</label>
+                <label class="switch" title="如果开启，遇到 %xx 会自动尝试解码"><input type="checkbox" id="autoDetect"
+                        checked />自动识别并解码</label>
+                <div class="hint">双击输入区或按 Ctrl/Cmd+K 可切换“编 ↔ 解”方向</div>
+                <div style="flex:1"></div>
+                <button class="btn ghost" id="clearInput" title="清空输入">清空</button>
             </div>
-            <textarea id="outputArea" placeholder="自动获得 URL 编码结果" readonly aria-readonly="true"></textarea>
-            <div class="action-bar">
-                <button class="btn ripple" id="copyBtn" title="复制结果">📋 复制</button>
+
+            <textarea id="inputArea" placeholder="输入任意内容（支持中文、英文、%xx 序列、URL 等）"></textarea>
+
+            <div class="row">
+                <button class="btn" id="runBtn">立即编/解码</button>
+                <div class="hint">或直接在上方输入，结果将实时更新</div>
             </div>
-        </section>
+        </div>
+
+        <div class="divider">
+            <div class="bar"></div>
+        </div>
+
+        <div class="col col-right" id="rightCol">
+            <h2 id="outputLabel">编码 / 解码 结果</h2>
+
+            <div class="row controls">
+                <div class="muted" id="modeLabel">当前模式：编码 → 解码</div>
+                <div style="flex:1"></div>
+                <div class="copied" id="copyMark">已复制</div>
+                <button class="btn ghost" id="clearOutput">清空</button>
+                <button class="btn" id="copyBtn">复制</button>
+            </div>
+
+            <textarea id="outputArea" readonly placeholder="编码或解码结果会显示在此处"></textarea>
+
+            <div class="row" style="margin-top:6px;">
+                <div class="hint">若解码失败，请检查 %xx 是否完整且为合法十六进制（例如 %E5%BC%A0）</div>
+            </div>
+        </div>
     </div>
+
     <script>
-        // 获取DOM
+        // DOM
         const inputArea = document.getElementById('inputArea');
         const outputArea = document.getElementById('outputArea');
-        const encodeBtn = document.getElementById('encodeBtn');
+        const fullEncodeEl = document.getElementById('fullEncode');
+        const autoDetectEl = document.getElementById('autoDetect');
+        const runBtn = document.getElementById('runBtn');
         const copyBtn = document.getElementById('copyBtn');
-        const swapBtn = document.getElementById('swapBtn');
-        const inputLabel = document.getElementById('inputLabel');
-        const outputLabel = document.getElementById('outputLabel');
-        const inputMode = document.getElementById('inputMode');
-        const outputMode = document.getElementById('outputMode');
-        const copyMark = document.getElementById('copyMark');
         const clearInput = document.getElementById('clearInput');
         const clearOutput = document.getElementById('clearOutput');
-        const urlCard = document.getElementById('urlCard');
+        const copyMark = document.getElementById('copyMark');
+        const modeLabel = document.getElementById('modeLabel');
 
-        // 状态控制
-        let encodeDirect = true;  // true=编码模式，false=解码模式
+        // 状态
+        let encodeDirect = true; // true: 输入 -> 编码输出 ; false: 输入视为 percent-encoded -> 解码输出
         let isSyncing = false;
 
-        // 编码解码函数
-        function urlEncode(str) {
-            try {
-                return encodeURIComponent(str)
-            } catch (e) {
-                return '';
+        // 全字节编码：将字符串转为 UTF-8 字节后逐字节 %HH（大写）
+        function percentEncodeAll(str) {
+            const utf8 = unescape(encodeURIComponent(str || ''));
+            let out = '';
+            for (let i = 0; i < utf8.length; i++) {
+                out += '%' + utf8.charCodeAt(i).toString(16).toUpperCase().padStart(2, '0');
             }
+            return out;
         }
-        function urlDecode(str) {
+        // 标准 encodeURIComponent
+        function standardEncode(str) {
+            try { return encodeURIComponent(str || ''); } catch (e) { return ''; }
+        }
+        // 解码（智能）
+        function smartDecode(str) {
+            if (!str) return '';
             try {
-                return decodeURIComponent(str)
+                return decodeURIComponent(str.replace(/\+/g, ' '));
             } catch (e) {
                 return null;
             }
         }
 
-        // 联动同步处理
+        // 判断文本是否包含可能的 percent-encoding 模式 (%HH)
+        function looksLikePercentEncoding(s) {
+            return /%[0-9A-Fa-f]{2}/.test(s);
+        }
+
+        // 主同步逻辑，包含自动识别解码
         function syncRealtime() {
             if (isSyncing) return;
             isSyncing = true;
-            let input = inputArea.value;
-            let out = '';
-            if (encodeDirect) {  // 编码
-                if (!input) {
-                    outputArea.value = '';
-                    outputArea.classList.remove('error-anim');
+            const txt = inputArea.value || '';
+            const fullEncode = !!fullEncodeEl.checked;
+            const autoDetect = !!autoDetectEl.checked;
+
+            // 自动检测优先级：当 autoDetect 开启且文本看起来像 %xx，则尝试解码；解码成功则显示解码结果并进入解码提示（但不改变 encodeDirect）
+            if (autoDetect && looksLikePercentEncoding(txt)) {
+                const dec = smartDecode(txt);
+                if (dec !== null) {
+                    outputArea.value = dec;
+                    outputArea.classList.remove('error');
+                    modeLabel.textContent = '自动识别：检测到 %xx → 已解码';
+                    isSyncing = false;
+                    return;
                 } else {
-                    try {
-                        out = urlEncode(input);
-                        outputArea.value = out;
-                        outputArea.classList.remove('error-anim');
-                    } catch {
-                        outputArea.value = '';
-                        outputArea.classList.add('error-anim');
-                    }
+                    // 若自动解码失败，再继续按当前 encodeDirect 逻辑处理（并给出错误提示）
                 }
-            } else {            // 解码
-                if (!input) {
+            }
+
+            // 按当前方向处理
+            if (encodeDirect) {
+                // 编码方向：原文 -> 输出编码
+                if (!txt) {
                     outputArea.value = '';
-                    inputArea.classList.remove('error-anim');
-                    outputArea.classList.remove('error-anim');
+                    modeLabel.textContent = '当前模式：编码 → 解码';
                 } else {
-                    let dec = urlDecode(input);
+                    outputArea.value = fullEncode ? percentEncodeAll(txt) : standardEncode(txt);
+                    modeLabel.textContent = '当前模式：编码 → 解码';
+                }
+                outputArea.classList.remove('error');
+            } else {
+                // 解码方向：将输入作为 percent-encoded 文本去 decode
+                if (!txt) {
+                    outputArea.value = '';
+                    inputArea.classList.remove('error');
+                    outputArea.classList.remove('error');
+                    modeLabel.textContent = '当前模式：解码 → 编码';
+                } else {
+                    const dec = smartDecode(txt);
                     if (dec === null) {
-                        outputArea.value = '[解码失败] 非法URL编码';
-                        outputArea.classList.add('error-anim');
-                        inputArea.classList.add('error-anim');
+                        outputArea.value = '[解码失败] 输入不是合法的 percent-encoding';
+                        outputArea.classList.add('error');
+                        inputArea.classList.add('error');
                     } else {
                         outputArea.value = dec;
-                        outputArea.classList.remove('error-anim');
-                        inputArea.classList.remove('error-anim');
+                        outputArea.classList.remove('error');
+                        inputArea.classList.remove('error');
                     }
+                    modeLabel.textContent = '当前模式：解码 → 编码';
                 }
             }
             isSyncing = false;
         }
 
-        // 输入事件
+        // 事件绑定
         inputArea.addEventListener('input', syncRealtime);
+        fullEncodeEl.addEventListener('change', syncRealtime);
+        autoDetectEl.addEventListener('change', syncRealtime);
 
-        // 按钮编解码
-        encodeBtn.addEventListener('click', () => {
-            syncRealtime();
-            outputArea.classList.add('fade-swap');
-            setTimeout(() => { outputArea.classList.remove('fade-swap') }, 340);
-            outputArea.focus();
-            outputArea.select();
-        });
+        runBtn.addEventListener('click', () => { syncRealtime(); outputArea.focus(); outputArea.select(); });
 
-        // 复制
         copyBtn.addEventListener('click', () => {
             outputArea.select();
-            document.execCommand('copy');
-            copyMark.classList.add('active');
-            setTimeout(() => copyMark.classList.remove('active'), 1050);
+            try {
+                document.execCommand('copy');
+                copyMark.classList.add('show');
+                setTimeout(() => copyMark.classList.remove('show'), 900);
+            } catch (e) { /* ignore */ }
         });
 
-        // 切换方向
-        swapBtn.addEventListener('click', () => {
-            encodeDirect = !encodeDirect;
-            // 交换标题与placeholder与模式指示
-            if (encodeDirect) {
-                inputLabel.textContent = '原始内容（自动URL编码）';
-                outputLabel.textContent = '编码结果（自动解码）';
-                inputArea.placeholder = '输入内容，如：https://www.domain.com/中文?x=张三';
-                outputArea.placeholder = '自动获得 URL 编码结果';
-                inputMode.textContent = '编码';
-                outputMode.textContent = '解码';
-                encodeBtn.textContent = '编码 ▶️';
-            } else {
-                inputLabel.textContent = '原始内容（自动URL解码）';
-                outputLabel.textContent = '解码结果（自动编码）';
-                inputArea.placeholder = '输入URL编码内容，如：%E5%BC%A0%E4%B8%89';
-                outputArea.placeholder = '自动获得 URL 解码原文';
-                inputMode.textContent = '解码';
-                outputMode.textContent = '编码';
-                encodeBtn.textContent = '解码 ▶️';
+        clearInput.addEventListener('click', () => { inputArea.value = ''; syncRealtime(); inputArea.focus(); });
+        clearOutput.addEventListener('click', () => { outputArea.value = ''; syncRealtime(); });
+
+        // 双击输出把内容回填到输入并自动切换处理方向（便捷）
+        outputArea.addEventListener('dblclick', () => {
+            if (outputArea.value) {
+                inputArea.value = outputArea.value;
+                encodeDirect = !encodeDirect;
+                syncRealtime();
             }
-            // 动画
-            inputArea.classList.add('fade-swap');
-            outputArea.classList.add('fade-swap');
-            setTimeout(() => {
-                inputArea.classList.remove('fade-swap');
-                outputArea.classList.remove('fade-swap');
-            }, 340);
-            // 自动刷新
+        });
+
+        // 双击输入区切换方向
+        inputArea.addEventListener('dblclick', () => {
+            encodeDirect = !encodeDirect;
             syncRealtime();
         });
 
-        // 清空输入输出
-        function clearTextarea(ele) {
-            ele.value = '';
-            ele.classList.remove('cleared-anim');
-            void ele.offsetWidth;
-            ele.classList.add('cleared-anim');
-            setTimeout(() => ele.classList.remove('cleared-anim'), 440);
-            syncRealtime();
-        }
-        clearInput.addEventListener('click', () => {
-            clearTextarea(inputArea);
-            inputArea.focus();
-        });
-        clearOutput.addEventListener('click', () => {
-            clearTextarea(outputArea);
-            outputArea.blur();
+        // 快捷键 Ctrl/Cmd+K 切换方向
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                encodeDirect = !encodeDirect;
+                syncRealtime();
+            }
         });
 
-        // 粘贴文件内容直接读到输入框
+        // 支持粘贴文件
         inputArea.addEventListener('paste', function (e) {
             const items = (e.clipboardData || window.clipboardData).items;
             for (let i = 0; i < items.length; i++) {
@@ -543,22 +481,33 @@
                         reader.onload = function (evt) {
                             inputArea.value = evt.target.result;
                             syncRealtime();
-                        }
+                        };
                         reader.readAsText(file, 'utf-8');
                     }
                 }
             }
         });
 
-        // 选中自动编/解码
-        window.onload = () => {
+        // 初始
+        window.addEventListener('load', () => {
             inputArea.value = '';
             outputArea.value = '';
-            inputArea.placeholder = '输入内容，如：https://domain.com/你好.html?xx=张三';
-            outputArea.placeholder = '自动获得 URL 编码结果';
+            fullEncodeEl.checked = true;
+            autoDetectEl.checked = true;
             encodeDirect = true;
             syncRealtime();
-        };
+        });
+
+        // 帮助
+        document.getElementById('helpBtn').addEventListener('click', () => {
+            alert(
+                '说明：\\n' +
+                '- 默认启用「全字节编码」，会对每个字符（包括英文字母）按 UTF-8 字节逐字节编码为 %HH。\\n' +
+                '- 若取消勾选则使用标准 encodeURIComponent（保留字母和数字不编码）。\\n' +
+                '- 开启「自动识别并解码」时，输入含 %XX 且为合法 percent-encoding 将自动解码并显示原文。\\n' +
+                '- 双击输入区或按 Ctrl/Cmd+K 可切换「编 ↔ 解」方向；双击输出可回填并自动切换方向。'
+            );
+        });
     </script>
 </body>
 
