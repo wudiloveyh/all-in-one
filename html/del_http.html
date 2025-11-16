@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Host 提取器 — 去掉协议只保留 host</title>
+    <style>
+        :root {
+            --max-width: 900px;
+            --bg-1: #f6f7fb;
+            --bg-2: #eef3f8;
+            --card: #ffffff;
+            --muted: #6b7280;
+            --text: #0f1724;
+            --accent: #6f5cff;
+            --accent-2: #22c6c3;
+            --radius: 14px;
+            --shadow: 0 10px 30px rgba(15, 20, 28, 0.06);
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+            color: var(--text);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 44px 20px;
+        }
+
+        .wrap {
+            width: min(var(--max-width), 100%);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.85));
+            border-radius: calc(var(--radius) + 6px);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(15, 20, 28, 0.04);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 8px 20px rgba(111, 92, 255, 0.10);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 16px
+        }
+
+        p.lead {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .btn {
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            border: 0;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(111, 92, 255, 0.10);
+        }
+
+        .btn.ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid rgba(15, 20, 28, 0.06);
+            box-shadow: none
+        }
+
+        .btn.small {
+            padding: 6px 10px;
+            font-size: 13px
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px
+        }
+
+        .panel {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid rgba(15, 20, 28, 0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 300px;
+            resize: vertical;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(15, 20, 28, 0.06);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+            font-size: 13px;
+            color: var(--text);
+            background: transparent;
+        }
+
+        pre.output {
+            width: 100%;
+            min-height: 300px;
+            overflow: auto;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(15, 20, 28, 0.04);
+            background: #0b1220;
+            color: #e6eef8;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        .switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.02);
+            padding: 6px 8px;
+            border-radius: 10px
+        }
+
+        .small-muted {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        footer {
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        @media (max-width:860px) {
+            .grid {
+                grid-template-columns: 1fr
+            }
+
+            .logo {
+                width: 44px;
+                height: 44px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap" role="application" aria-label="Host 提取器">
+        <header>
+            <div class="brand">
+                <div class="logo" aria-hidden="true">H</div>
+                <div>
+                    <h1>Host 提取器</h1>
+                    <p class="lead">去掉协议与路径，只保留 host（含端口）——支持批量粘贴与导出</p>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" id="runBtn" title="提取 host">提取</button>
+                <button class="btn ghost small" id="clearBtn" title="清空输入">清空输入</button>
+            </div>
+        </header>
+
+        <div class="grid">
+            <div class="panel">
+                <label for="input">输入（每行一个，支持带或不带协议的 URL / host:port / 域名 / IP）：</label>
+                <textarea id="input" placeholder="在这里粘贴或输入要处理的列表..."></textarea>
+
+                <div class="row" style="justify-content:space-between;margin-top:6px">
+                    <div class="small-muted">支持自动去除协议（http(s)://）、保留端口，忽略空行</div>
+                    <div class="actions">
+                        <button class="btn small" id="pasteBtn">粘贴示例</button>
+                        <button class="btn small" id="trimBtn" title="去重并保留原顺序">去重</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <label for="output">输出（hosts）：</label>
+                <pre id="output" class="output" aria-live="polite"></pre>
+
+                <div class="row" style="justify-content:space-between">
+                    <div class="muted" id="count">0 项</div>
+                    <div class="actions">
+                        <button class="btn small" id="copyBtn">复制为换行文本</button>
+                        <button class="btn small" id="copyArrBtn">复制为 JS 数组</button>
+                        <button class="btn small" id="downloadBtn">下载 .txt</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="small-muted">纯前端，无需联网。解析基于 URL 尝试解析并回退至最简单的文本分割。</div>
+            <div class="small-muted">v1.0</div>
+        </footer>
+    </div>
+
+    <script>
+        (function () {
+            const input = document.getElementById('input');
+            const output = document.getElementById('output');
+            const runBtn = document.getElementById('runBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const copyArrBtn = document.getElementById('copyArrBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const pasteBtn = document.getElementById('pasteBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const trimBtn = document.getElementById('trimBtn');
+            const countEl = document.getElementById('count');
+
+            // 预置用户提供的列表作为示例
+            const sample = 'https://1.1.1.1'
+
+
+            // helper: extract host from a single line
+            function extractHost(line) {
+                if (!line) return '';
+                let s = line.trim();
+                // remove surrounding quotes
+                if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+                    s = s.slice(1, -1).trim();
+                }
+                if (s === '') return '';
+
+                // try using URL first (handles auth, port, ip, domain, etc.)
+                try {
+                    // If line looks like scheme://..., pass as-is
+                    if (/^[a-zA-Z][a-zA-Z0-9+\-.]*:\/\//.test(s)) {
+                        const u = new URL(s);
+                        return u.host; // hostname:port if any
+                    }
+                    // If it contains spaces or slashes but no scheme, try adding http://
+                    const u2 = new URL('http://' + s);
+                    return u2.host;
+                } catch (e) {
+                    // fallback: remove scheme-like prefix and take until first / ? # or whitespace
+                    let t = s.replace(/^[a-zA-Z][a-zA-Z0-9+\-.]*:\/\//, '');
+                    t = t.split(/[\/\?#\s]/)[0];
+                    // if it still empty, return empty
+                    return t;
+                }
+            }
+
+            function processText(text, { unique = false } = {}) {
+                const lines = text.split(/\r?\n/);
+                const out = [];
+                const seen = new Set();
+                for (let raw of lines) {
+                    const host = extractHost(raw);
+                    if (!host) continue;
+                    if (unique) {
+                        if (seen.has(host)) continue;
+                        seen.add(host);
+                    }
+                    out.push(host);
+                }
+                return out;
+            }
+
+            function renderResult(arr) {
+                output.textContent = arr.join('\n');
+                countEl.textContent = arr.length + ' 项';
+            }
+
+            runBtn.addEventListener('click', () => {
+                const arr = processText(input.value, { unique: false });
+                renderResult(arr);
+            });
+
+            // paste example
+            pasteBtn.addEventListener('click', () => {
+                input.value = sample;
+            });
+
+            // clear input
+            clearBtn.addEventListener('click', () => {
+                input.value = '';
+            });
+
+            // trim / 去重 保留原顺序
+            trimBtn.addEventListener('click', () => {
+                const arr = processText(input.value, { unique: true });
+                input.value = arr.join('\n');
+                renderResult(arr);
+            });
+
+            // copy plain
+            copyBtn.addEventListener('click', async () => {
+                const text = output.textContent.trim();
+                if (!text) return alert('没有要复制的内容，请先点击提取');
+                try {
+                    await navigator.clipboard.writeText(text);
+                    copyBtn.textContent = '已复制';
+                    setTimeout(() => copyBtn.textContent = '复制为换行文本', 1500);
+                } catch (e) {
+                    alert('复制失败，请手动复制输出内容');
+                }
+            });
+
+            // copy as JS array
+            copyArrBtn.addEventListener('click', async () => {
+                const arr = output.textContent.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+                if (arr.length === 0) return alert('没有要复制的内容，请先点击提取');
+                const js = 'const hosts = [\n' + arr.map(s => '  ' + JSON.stringify(s)).join(',\n') + '\n];';
+                try {
+                    await navigator.clipboard.writeText(js);
+                    copyArrBtn.textContent = '已复制';
+                    setTimeout(() => copyArrBtn.textContent = '复制为 JS 数组', 1500);
+                } catch (e) {
+                    alert('复制失败，请手动复制输出内容');
+                }
+            });
+
+            // download .txt
+            downloadBtn.addEventListener('click', () => {
+                const text = output.textContent.trim();
+                if (!text) return alert('没有要下载的内容，请先点击提取');
+                const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'hosts.txt';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            });
+
+            // live auto-process on input (debounced)
+            let timer = null;
+            input.addEventListener('input', () => {
+                clearTimeout(timer);
+                timer = setTimeout(() => {
+                    const arr = processText(input.value, { unique: false });
+                    renderResult(arr);
+                }, 250);
+            });
+
+            // initialize with sample
+            input.value = sample;
+            (function init() {
+                const arr = processText(input.value, { unique: false });
+                renderResult(arr);
+            })();
+
+            // expose a function for console use if needed
+            window.__extractHosts = function (text, opts) { return processText(String(text || ''), opts || {}); };
+
+        })();
+    </script>
+</body>
+
+</html>
