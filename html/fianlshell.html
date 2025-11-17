@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <title>哈希计算</title>
+    <style>
+        div.footer{
+            position: fixed;
+            bottom: 0;
+            right: 0;
+        }
+    </style>
+</head>
+ 
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-4">哈希计算</h1>
+        <label for="machineCode" class="block mb-2">输入机器码:</label>
+        <input type="text" id="machineCode" class="border border-gray-300 p-2 w-full mb-4">
+        <button id="calculateButton" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">计算</button>
+        <div id="result" class="mt-4"></div>
+    </div>
+    <div class="footer">
+        这个页面并非本人写的，只是觉得很有用才放在这里的，作者：梦里余杭
+    </div>
+ 
+    <script>
+        // 引入哈希库
+        function md5(str) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(str);
+            return CryptoJS.MD5(CryptoJS.enc.Utf8.parse(str)).toString();
+        }
+ 
+        function keccak384(str) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(str);
+            return CryptoJS.SHA3(str, { outputLength: 384 }).toString();
+        }
+ 
+        document.getElementById('calculateButton').addEventListener('click', function () {
+            const code = document.getElementById('machineCode').value;
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+ 
+            resultDiv.innerHTML += '<p>版本号 < 3.9.6 (旧版)</p>';
+            resultDiv.innerHTML += `<p>高级版: ${md5(`61305${code}8552`).slice(8, 24)}</p>`;
+            resultDiv.innerHTML += `<p>专业版: ${md5(`2356${code}13593`).slice(8, 24)}</p>`;
+ 
+            resultDiv.innerHTML += '<p>版本号 >= 3.9.6 (新版)</p>';
+            resultDiv.innerHTML += `<p>高级版: ${keccak384(`${code}hSf(78cvVlS5E)`).slice(12, 28)}</p>`;
+            resultDiv.innerHTML += `<p>专业版: ${keccak384(`${code}FF3Go(*Xvbb5s2)`).slice(12, 28)}</p>`;
+ 
+            resultDiv.innerHTML += '<p>版本号 (4.5)</p>';
+            resultDiv.innerHTML += `<p>高级版: ${keccak384(`${code}wcegS3gzA$`).slice(12, 28)}</p>`;
+            resultDiv.innerHTML += `<p>专业版: ${keccak384(`${code}b(xxkHn%z);x`).slice(12, 28)}</p>`;
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</body>
+ 
+</html>
