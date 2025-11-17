@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hex ↔ RGB 颜色互转 - 单文件</title>
+    <style>
+        :root {
+            --bg: #0f1724;
+            --card: #0b1220;
+            --muted: #9aa7b2;
+            --accent: #7dd3fc
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(180deg, var(--bg), #071022);
+            color: #e6f0f6;
+            padding: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh
+        }
+
+        .wrapper {
+            width: 820px;
+            max-width: 95vw;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(2, 6, 23, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.03)
+        }
+
+        header {
+            display: flex;
+            gap: 16px;
+            align-items: center
+        }
+
+        header h1 {
+            font-size: 18px;
+            margin: 0
+        }
+
+        header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 260px;
+            gap: 18px;
+            margin-top: 16px
+        }
+
+        .card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.02)
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 8px
+        }
+
+        .field {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        input[type=text] {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            background: rgba(255, 255, 255, 0.02);
+            color: inherit;
+            font-size: 14px
+        }
+
+        button {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 600
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #0ea5e9, #60a5fa);
+            color: #041023
+        }
+
+        .btn-ghost {
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--muted)
+        }
+
+        .preview {
+            height: 140px;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative
+        }
+
+        .preview .meta {
+            background: rgba(0, 0, 0, 0.22);
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 13px
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px
+        }
+
+        .small {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .palette {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px
+        }
+
+        .swatch {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transform: translateY(0);
+            transition: transform 160ms ease
+        }
+
+        .swatch:active {
+            transform: translateY(2px)
+        }
+
+        .hint {
+            color: #9fb7c6;
+            font-size: 13px;
+            margin-top: 10px
+        }
+
+        .footer {
+            margin-top: 14px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .log {
+            font-family: monospace;
+            font-size: 12px;
+            color: #bfe6ff
+        }
+
+        .copy-ok {
+            animation: pop .6s ease both
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(.96);
+                opacity: 0
+            }
+
+            60% {
+                transform: scale(1.06);
+                opacity: 1
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        /* responsive */
+        @media (max-width:840px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .preview {
+                height: 120px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper" role="application">
+        <header>
+            <div>
+                <h1>Hex ↔ RGB 颜色互换（单文件）</h1>
+                <p>输入十六进制或 rgb(a)，自动转换并实时预览。支持 #3 / #6 / rgba、复制与随机颜色。</p>
+            </div>
+        </header>
+
+        <div class="grid">
+            <div>
+                <div class="card">
+                    <label for="hex">十六进制（支持 #abc、#aabbcc）</label>
+                    <div class="field">
+                        <input id="hex" type="text" placeholder="#1a2b3c 或 1a2b3c" autocomplete="off" />
+                        <button id="hexToRgb" class="btn-primary">转换 → RGB</button>
+                        <button id="hexCopy" class="btn-ghost">复制</button>
+                    </div>
+
+                    <div style="height:12px"></div>
+
+                    <label for="rgb">RGB(A)（例如 rgb(26,43,60) 或 rgba(26,43,60,0.8)）</label>
+                    <div class="field">
+                        <input id="rgb" type="text" placeholder="rgb(255, 0, 0) 或 255,0,0" />
+                        <button id="rgbToHex" class="btn-primary">转换 → HEX</button>
+                        <button id="rgbCopy" class="btn-ghost">复制</button>
+                    </div>
+
+                    <div class="row small">
+                        <div>错误/状态：<span id="status" class="log">等待输入</span></div>
+                    </div>
+
+                    <div class="hint">快捷：输入后按 Enter 自动转换；点击色板快速取色。</div>
+
+                    <div class="palette" id="palette">
+                        <!-- swatches filled by JS -->
+                    </div>
+
+                    <div class="footer">
+                        <div style="display:flex;gap:8px">
+                            <button id="random" class="btn-ghost">随机颜色</button>
+                            <button id="toCssVar" class="btn-ghost">复制为 CSS 变量</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="card preview" id="preview" aria-live="polite">
+                    <div class="meta" id="previewText">#1a2b3c — rgb(26, 43, 60)</div>
+                    <div style="flex:1"></div>
+                    <div
+                        style="width:100%;display:flex;gap:10px;align-items:center;justify-content:center;padding-bottom:12px">
+                        <button id="copyPreview" class="btn-primary">复制颜色</button>
+                        <button id="downloadPng" class="btn-ghost">下载预览图</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer style="margin-top:12px;color:var(--muted);font-size:13px">说明：支持省略 #；RGB 输入可以是带函数或仅数字逗号分隔。出错时状态会提示。
+        </footer>
+    </div>
+
+    <script>
+        // 工具函数
+        const $ = id => document.getElementById(id);
+        const hexInput = $('hex');
+        const rgbInput = $('rgb');
+        const status = $('status');
+        const preview = $('preview');
+        const previewText = $('previewText');
+
+        function normalizeHex(raw) {
+            if (!raw) return null;
+            raw = raw.trim().toLowerCase();
+            if (raw.startsWith('#')) raw = raw.slice(1);
+            // allow 3 or 6 or 8 (with alpha)
+            if (/^([0-9a-f]{3})$/.test(raw)) {
+                return raw.split('').map(ch => ch + ch).join('');
+            }
+            if (/^([0-9a-f]{6})$/.test(raw)) return raw;
+            if (/^([0-9a-f]{8})$/.test(raw)) return raw; // includes alpha
+            return null;
+        }
+
+        function hexToRgba(hex) {
+            const n = normalizeHex(hex);
+            if (!n) return null;
+            const r = parseInt(n.slice(0, 2), 16);
+            const g = parseInt(n.slice(2, 4), 16);
+            const b = parseInt(n.slice(4, 6), 16);
+            const a = n.length === 8 ? (parseInt(n.slice(6, 8), 16) / 255).toFixed(3) : null;
+            return a === null ? { r, g, b } : { r, g, b, a: parseFloat(a) };
+        }
+
+        function rgbaToHex(r, g, b, a) {
+            const clamp = (v, min = 0, max = 255) => Math.max(min, Math.min(max, Math.round(Number(v) || 0)));
+            const rh = clamp(r).toString(16).padStart(2, '0');
+            const gh = clamp(g).toString(16).padStart(2, '0');
+            const bh = clamp(b).toString(16).padStart(2, '0');
+            if (typeof a === 'number') {
+                const aa = Math.round(Math.max(0, Math.min(1, a)) * 255).toString(16).padStart(2, '0');
+                return `#${rh}${gh}${bh}${aa}`;
+            }
+            return `#${rh}${gh}${bh}`;
+        }
+
+        function parseRgbString(str) {
+            if (!str) return null;
+            const s = str.trim();
+            // accept: rgb(1,2,3) rgba(1,2,3,0.5) or "1,2,3" or "1 2 3" or "255 0 0 / 0.5"
+            const fnMatch = s.match(/^(rgba?|\s*)\(?\s*([\d.]+)\s*[ ,\/]\s*([\d.]+)\s*[ ,\/]\s*([\d.]+)(?:[ ,\/]\s*([\d.]+))?\s*\)?$/i);
+            if (fnMatch) {
+                const r = Number(fnMatch[2]);
+                const g = Number(fnMatch[3]);
+                const b = Number(fnMatch[4]);
+                const a = fnMatch[5] !== undefined ? Number(fnMatch[5]) : undefined;
+                if ([r, g, b].some(v => isNaN(v))) return null;
+                return { r, g, b, a };
+            }
+            // fallback: try splitting by non-number
+            const parts = str.split(/[^0-9.]+/).filter(Boolean);
+            if (parts.length >= 3) {
+                const r = Number(parts[0]), g = Number(parts[1]), b = Number(parts[2]);
+                const a = parts[3] !== undefined ? Number(parts[3]) : undefined;
+                if ([r, g, b].some(v => isNaN(v))) return null;
+                return { r, g, b, a };
+            }
+            return null;
+        }
+
+        function setStatus(msg, isError = false) {
+            status.textContent = msg;
+            status.style.color = isError ? '#ffb4b4' : '#bfe6ff';
+        }
+
+        function updatePreviewFromHex(hexRaw) {
+            const rgba = hexToRgba(hexRaw);
+            if (!rgba) { setStatus('无效的 HEX'); return; }
+            const css = rgba.a === undefined ? `rgb(${rgba.r}, ${rgba.g}, ${rgba.b})` : `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`;
+            preview.style.background = css;
+            previewText.textContent = (hexRaw.startsWith('#') ? hexRaw : ('#' + hexRaw)) + ' — ' + css;
+            setStatus('HEX → RGB ✓');
+        }
+
+        function updatePreviewFromRgb(rgbRaw) {
+            const p = parseRgbString(rgbRaw);
+            if (!p) { setStatus('无法解析 RGB(A)'); return; }
+            const css = p.a === undefined ? `rgb(${p.r}, ${p.g}, ${p.b})` : `rgba(${p.r}, ${p.g}, ${p.b}, ${p.a})`;
+            preview.style.background = css;
+            const hex = rgbaToHex(p.r, p.g, p.b, p.a);
+            previewText.textContent = `${hex} — ${css}`;
+            setStatus('RGB → HEX ✓');
+        }
+
+        // 按钮与事件
+        $('hexToRgb').addEventListener('click', () => {
+            const v = hexInput.value.trim();
+            const n = normalizeHex(v);
+            if (!n) { setStatus('请输入有效的十六进制颜色（例如 #1a2b3c 或 #abc）', true); return; }
+            const rgba = hexToRgba(v);
+            const css = rgba.a === undefined ? `rgb(${rgba.r}, ${rgba.g}, ${rgba.b})` : `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`;
+            rgbInput.value = css;
+            updatePreviewFromHex(v);
+        });
+
+        $('rgbToHex').addEventListener('click', () => {
+            const v = rgbInput.value.trim();
+            const p = parseRgbString(v);
+            if (!p) { setStatus('请输入有效的 RGB，例如 "rgb(26,43,60)" 或 "26,43,60"', true); return; }
+            const hex = rgbaToHex(p.r, p.g, p.b, p.a);
+            hexInput.value = hex;
+            updatePreviewFromRgb(v);
+        });
+
+        // Enter 键自动转换
+        [hexInput, rgbInput].forEach(el => el.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                if (el === hexInput) $('hexToRgb').click(); else $('rgbToHex').click();
+            }
+        }));
+
+        // 复制按钮
+        async function copyText(t) {
+            try {
+                await navigator.clipboard.writeText(t);
+                setStatus('已复制到剪贴板 ✓');
+            } catch (e) {
+                setStatus('复制失败：浏览器限制', true);
+            }
+        }
+        $('hexCopy').addEventListener('click', () => {
+            const h = hexInput.value.trim() || previewText.textContent.split(' ')[0];
+            copyText(h.startsWith('#') ? h : '#' + h);
+        });
+        $('rgbCopy').addEventListener('click', () => copyText(rgbInput.value.trim()));
+        $('copyPreview').addEventListener('click', () => {
+            // copy current preview text between — and left
+            copyText(previewText.textContent.split('—')[0].trim());
+        });
+
+        // CSS 变量
+        $('toCssVar').addEventListener('click', () => {
+            const hex = hexInput.value.trim() || previewText.textContent.split('—')[0].trim();
+            const name = prompt('输入 CSS 变量名（不带 --）, 例如 primary');
+            if (!name) return;
+            copyText(`--${name}: ${hex.startsWith('#') ? hex : '#' + hex};`);
+        });
+
+        // 随机颜色
+        function randomHex() {
+            const v = Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
+            return '#' + v;
+        }
+        $('random').addEventListener('click', () => {
+            const h = randomHex(); hexInput.value = h; $('hexToRgb').click();
+        });
+
+        // 预览下载（生成小 PNG）
+        $('downloadPng').addEventListener('click', () => {
+            const w = 800, h = 400;
+            const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            // draw gradient from preview
+            ctx.fillStyle = window.getComputedStyle(preview).backgroundColor || '#000';
+            ctx.fillRect(0, 0, w, h);
+            // small text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '20px monospace';
+            ctx.fillText(previewText.textContent, 20, 36);
+            const a = canvas.toDataURL('image/png');
+            const link = document.createElement('a'); link.href = a; link.download = 'color-preview.png'; link.click();
+        });
+
+        // 快速色板
+        const paletteColors = ['#0ea5e9', '#60a5fa', '#7c3aed', '#ec4899', '#ef4444', '#f97316', '#facc15', '#22c55e', '#10b981', '#06b6d4', '#1e293b', '#0f1724'];
+        const palette = $('palette');
+        paletteColors.forEach(c => {
+            const s = document.createElement('div'); s.className = 'swatch'; s.style.background = c; s.title = c; s.addEventListener('click', () => { hexInput.value = c; $('hexToRgb').click(); });
+            palette.appendChild(s);
+        });
+
+        // 解析输入实时更新预览（debounce）
+        let tmr;
+        [hexInput, rgbInput].forEach(el => el.addEventListener('input', () => {
+            clearTimeout(tmr);
+            tmr = setTimeout(() => {
+                if (el === hexInput) { const n = normalizeHex(el.value); if (n) updatePreviewFromHex(el.value); }
+                else { const p = parseRgbString(el.value); if (p) updatePreviewFromRgb(el.value); }
+            }, 250);
+        }));
+
+        // 初始化
+        (function init() {
+            hexInput.value = '#1a2b3c';
+            $('hexToRgb').click();
+        })();
+
+    </script>
+</body>
+
+</html>
